@@ -1,13 +1,13 @@
 #summary Wiki Home Page
 #labels Featured
 
-= Introduction =
-A
-B
-C
-D
-E
-F
-G
+= Welcome to Project Preáchán =
+<pre>
+A Project Rational
+B Project Goals
+C Project Management
+D Project Implementation
+E Project Technology
 
-Add your content here.
+</pre>
+More content to come I'm sure.
