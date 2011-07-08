@@ -1,4 +1,5 @@
-#summary Landing Page
+#summary Wiki Home Page
+#labels Featured
 
 = Introduction =
 A
