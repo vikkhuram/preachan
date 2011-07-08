@@ -1,8 +1,6 @@
 #summary requirements data and limitations and user stories
 #labels Phase-Requirements
 
-= Introduction =
-More to come...
 
 = Software Requirements =
 
