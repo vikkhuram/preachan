@@ -1,0 +1,12 @@
+#summary requirements data and limitations and user stories
+#labels Phase-Requirements
+
+= Introduction =
+More to come...
+
+= Software Requirements =
+
+ # In greater levels of detail starting with the Twitter API
+ # Then my requirements.
+ # My user stories
+ # more to come...
