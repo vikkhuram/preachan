@@ -3,8 +3,28 @@
 
 
 = Software Requirements =
+== Mainly from Twitter API ==
 
- # In greater levels of detail starting with the Twitter API
- # Then my requirements.
- # My user stories
- # more to come...
+  # Account resources
+  # Block resources
+  # Timeline resources
+  # Tweets resources
+  # User resources
+  # Trends resources
+  # Local Trends resources
+  # List resources
+  # List Members resources
+  # List Subscribers resources
+  # Direct Messages resources
+  # Friendship resources
+  # Friends and Followers resources
+  # Favorites resources
+  # Notification resources
+  # Spam Reporting resources
+  # Saved Searches resources
+  # OAuth resources
+  # Geo resources
+  # Legal resources
+  # Help resources
+  # Deprecated resources
+  # Search resources
