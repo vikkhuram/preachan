@@ -18,11 +18,17 @@ import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 import javax.ws.rs.core.MultivaluedMap;
 import twitter.twitteroauth.twitterresponse.StatusType;
 import twitter.twitteroauth.twitterresponse.Statuses;
@@ -33,9 +39,33 @@ import twitter.twitteroauth.twitterresponse.UserType;
  * @author Kevin Doyle
  */
 public class TwitterJFrame extends javax.swing.JFrame {
-
+private DefaultListModel statusesListModel = new DefaultListModel();
     /** Creates new form TwitterJFrame */
     public TwitterJFrame() {
+         Timer t = new Timer("Twitter Updater`", false);
+         t.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run(){
+System.out.println("Timer Task is running");
+    try {
+        client.initOAuth();
+        Statuses response = client.getFriendsTimeline(Statuses.class, null, null, null, "10");
+        // Clear the list model so it does not replicate the contents from the last run
+        statusesListModel.clear();
+        // Create a Status Type object for every status in the Status list, and add an element
+        // to the list model for every status type object
+        for (final StatusType st : response.getStatus()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    statusesListModel.addElement(st);
+                }
+            });
+        }
+    } catch (UniformInterfaceException ex) {
+    System.out.println("Exception when calling getFriendsTimeline = " + ex.getResponse().getEntity(String.class));
+    }
+            }
+        }, 30000, 75000);
         initComponents();
         try {
         initUserInfo();
@@ -62,19 +92,21 @@ public class TwitterJFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jButton1.setText("Update");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Icon");
         jLabel1.setMaximumSize(new java.awt.Dimension(48, 48));
         jLabel1.setMinimumSize(new java.awt.Dimension(48, 48));
         jLabel1.setPreferredSize(new java.awt.Dimension(48, 48));
 
-        jTextField1.setText("Status");
+        jTextField1.setText("status");
 
-        jList1.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
+        jList1.setModel(statusesListModel);
+        jList1.setCellRenderer(new Item());
         jScrollPane1.setViewportView(jList1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -110,9 +142,25 @@ public class TwitterJFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       String rawStatus = jTextField1.getText().trim();
+  //String status = URLEncoder.encode(rawStatus, "UTF-8");
+       //     try{
+  //  String status = URLEncoder.encode(rawStatus, "UTF-8" );
+  //     }
+   //    catch(java.io.UnsupportedEncodingException uee){}
+    client.makeOAuthRequestUnique();
+    try {
+        String status = URLEncoder.encode(rawStatus, "UTF-8" );
+    client.updateStatus(String.class, status, null);
+    } catch(UniformInterfaceException ex){
+        System.out.println("Exception when calling updateStatus = " + ex.getResponse().getEntity(String.class));
+    }catch (UnsupportedEncodingException uee){}
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     private void initUserInfo() throws MalformedURLException, IOException {
 //Create an instance of the internal service class
-    client = new Twitter_OAuth_user_timeline__format_JerseyClient("xml");
+    client = new TwitterClient();
 
 
     //Log in, get tokens, and append the tokens to the consumer and secret
@@ -156,17 +204,17 @@ public class TwitterJFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
-private Twitter_OAuth_user_timeline__format_JerseyClient client; //used to represent an instance of internal class
-    static class Twitter_OAuth_user_timeline__format_JerseyClient {
+private TwitterClient client; //used to represent an instance of internal class
+    static class TwitterClient {
 
         private WebResource webResource;
         private Client client;
         private static final String BASE_URI = "http://twitter.com";
 
-        public Twitter_OAuth_user_timeline__format_JerseyClient(String format) {
+        public TwitterClient() {
             com.sun.jersey.api.client.config.ClientConfig config = new com.sun.jersey.api.client.config.DefaultClientConfig();
             client = Client.create(config);
-            String resourcePath = java.text.MessageFormat.format("statuses/user_timeline.{0}", new Object[]{format});
+            String resourcePath = "statuses";
             webResource = client.resource(BASE_URI).path(resourcePath);
         }
         private static final String OAUTH_BASE_URL = "http://twitter.com/oauth";
@@ -184,10 +232,7 @@ private Twitter_OAuth_user_timeline__format_JerseyClient client; //used to repre
         private String oauth_access_token;
         private String oauth_access_token_secret;
 
-        public void setResourcePath(String format) {
-            String resourcePath = java.text.MessageFormat.format("statuses/user_timeline.{0}", new Object[]{format});
-            webResource = client.resource(BASE_URI).path(resourcePath);
-        }
+
 
         /**
          * @param responseType Class representing the response
@@ -200,9 +245,20 @@ private Twitter_OAuth_user_timeline__format_JerseyClient client; //used to repre
         public <T> T getUserTimeline(Class<T> responseType, String since, String since_id, String page, String count) throws UniformInterfaceException {
             String[] queryParamNames = new String[]{"since", "since_id", "page", "count"};
             String[] queryParamValues = new String[]{since, since_id, page, count};
-            return webResource.queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
+            return webResource.path("user_timeline.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
         }
 
+public <T> T getFriendsTimeline(Class<T> responseType, String since, String since_id, String page, String count) throws UniformInterfaceException {
+            String[] queryParamNames = new String[]{"since", "since_id", "page", "count"};
+            String[] queryParamValues = new String[]{since, since_id, page, count};
+            return webResource.path("friends_timeline.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
+        }
+
+public <T> T updateStatus(Class<T> responseType, String status, String in_reply_to_status_id) throws UniformInterfaceException {
+            String[] formParamNames = new String[]{"status", "in_reply_to_status_id"};
+            String[] formParamValues = new String[]{status, in_reply_to_status_id};
+            return webResource.path("update.xml").type(javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED).post(responseType, getQueryOrFormParams(formParamNames, formParamValues));
+        }
         private MultivaluedMap getQueryOrFormParams(String[] paramNames, String[] paramValues) {
             MultivaluedMap<String, String> qParams = new com.sun.jersey.api.representation.Form();
             for (int i = 0; i < paramNames.length; i++) {
@@ -293,4 +349,10 @@ private Twitter_OAuth_user_timeline__format_JerseyClient client; //used to repre
             return oauth_verifier;
         }
     }
+
+
+
+
+
+
 }
