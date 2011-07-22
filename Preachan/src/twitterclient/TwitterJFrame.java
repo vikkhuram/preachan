@@ -56,6 +56,7 @@ System.out.println("Timer Task is running");
         // to the list model for every status type object
         for (final StatusType st : response.getStatus()) {
             SwingUtilities.invokeLater(new Runnable() {
+                            @Override
                 public void run() {
                     statusesListModel.addElement(st);
                 }
@@ -144,11 +145,7 @@ System.out.println("Timer Task is running");
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        String rawStatus = jTextField1.getText().trim();
-  //String status = URLEncoder.encode(rawStatus, "UTF-8");
-       //     try{
-  //  String status = URLEncoder.encode(rawStatus, "UTF-8" );
-  //     }
-   //    catch(java.io.UnsupportedEncodingException uee){}
+
     client.makeOAuthRequestUnique();
     try {
         String status = URLEncoder.encode(rawStatus, "UTF-8" );
@@ -161,7 +158,8 @@ System.out.println("Timer Task is running");
     private void initUserInfo() throws MalformedURLException, IOException {
 //Create an instance of the internal service class
     client = new TwitterClient();
-
+    //Bring st back into scope at method level KD 15/07/11
+    StatusType st = new StatusType();
 
     //Log in, get tokens, and append the tokens to the consumer and secret
     //keys
@@ -172,10 +170,13 @@ System.out.println("Timer Task is running");
     //Call getUserTimeline, get a list of statuses, pass the most recent
     //status as a StatusType object, and display the text of that object
     //in the JTextField
+    try {
     Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
-    StatusType st = statuses.getStatus().get(0);
+    st = statuses.getStatus().get(0);
     jTextField1.setText(st.getText().trim());
-
+    } catch (java.lang.IndexOutOfBoundsException IOfBoundsException) {
+        Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, IOfBoundsException);
+    }
 
     //Get a UserType object from the StatusType object, get the URL of that
     //user's icon, and display that icon in the JLabel
@@ -192,6 +193,7 @@ System.out.println("Timer Task is running");
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 new TwitterJFrame().setVisible(true);
             }
@@ -221,11 +223,11 @@ private TwitterClient client; //used to represent an instance of internal class
         /**
          * Please, specify the consumer_key string obtained from service API pages
          */
-        private static final String CONSUMER_KEY = "rKVCI3nzs8R0qMoi0LRtw";
+        private static final String CONSUMER_KEY = "uDgRAVEtjxsBtR52PqAA";
         /**
          * Please, specify the consumer_secret string obtained from service API pages
          */
-        private static final String CONSUMER_SECRET = "RkWsCXIkot7A4OT53y12L9odHH292dE47pL2TkGStkk";
+        private static final String CONSUMER_SECRET = "85zAfuclWgW7cZTmgqVUq2JEicD6kV6sCOH6SIIZU";
         private OAuthParameters oauth_params;
         private OAuthSecrets oauth_secrets;
         private OAuthClientFilter oauth_filter;
@@ -335,7 +337,6 @@ public <T> T updateStatus(Class<T> responseType, String status, String in_reply_
             try {
                 java.awt.Desktop.getDesktop().browse(new java.net.URI("http://twitter.com/oauth/authorize?oauth_token=" + requestTokenResponse.getFirst("oauth_token")));
             } catch (java.net.URISyntaxException ex) {
-                ex.printStackTrace();
             }
             java.io.BufferedReader br = null;
             String oauth_verifier = null;
