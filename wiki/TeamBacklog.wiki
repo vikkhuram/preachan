@@ -1,0 +1,15 @@
+#summary One-sentence summary of this page.
+#labels Phase-Design
+
+= Agile Team Backlog =
+<pre>
+1 GET statuses/home_timeline
+2 GET statuses/mentions
+3 GET statuses/public_timeline
+4 GET statuses/retweeted_by_me
+5 GET statuses/retweeted_to_me
+6 GET statuses/retweets_of_me
+7 GET statuses/user_timeline
+8 GET statuses/retweeted_to_user
+9 GET statuses/retweeted_by_user
+</pre>
