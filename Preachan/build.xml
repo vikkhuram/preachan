@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project basedir="." default="default" name="Preachan">
-    <description>Builds, tests, and runs the project Preachan.</description>
+<project basedir="." default="default" name="TwitterUIDesign">
+    <description>Builds, tests, and runs the project TwitterUIDesign.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
@@ -59,7 +59,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="Preachan-impl.jar">
+        <target name="run" depends="TwitterUIDesign-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>
@@ -79,8 +79,13 @@
 </target>
 
 <!--Target required for SAAS(REST) services: data types generation-->
+<target depends="saas-init-xjc" name="saas.xjc.twitter.whatareyoudoingservice">
+<xjc destdir="src" package="twitter.whatareyoudoingservice.twitterresponse" schema="src/META-INF/TwitterResponse.xsd" target="2.1"/>
+</target>
+
+<!--Target required for SAAS(REST) services: data types generation-->
 <target depends="saas-init-xjc" name="saas.xjc.twitter.twitteroauth">
-<xjc destdir="src" package="twitter.twitteroauth.twitterresponse" schema="src/META-INF/TwitterResponse.xsd" target="2.1"/>
+<xjc destdir="src" package="twitter.twitteroauth.twitterresponse" schema="C:/Documents and Settings/Kevin Doyle/.netbeans/7.0/config/WebServices/TwitterOAuth/catalog/TwitterResponse.xsd" target="2.1"/>
 </target>
 
 </project>
