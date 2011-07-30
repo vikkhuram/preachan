@@ -4,9 +4,9 @@
  */
 
 /*
- * Item.java
+ * ListsItem.java
  *
- * Created on 24-Jul-2011, 13:35:45
+ * Created on 30-Jul-2011, 18:55:47
  */
 package twitterclient;
 
@@ -19,25 +19,22 @@ import twitter.twitteroauth.twitterresponse.StatusType;
  *
  * @author Kevin Doyle
  */
-public class Item extends javax.swing.JPanel implements ListCellRenderer{
+public class ListsItem extends javax.swing.JPanel implements ListCellRenderer{
 
-    /** Creates new form Item */
-    public Item() {
+    /** Creates new form ListsItem */
+    public ListsItem() {
         initComponents();
     }
-
-    @Override
+ @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean sel, boolean focus) {
-
 
         StatusType st = (StatusType) value;
         //put the username into the text box with the txt message 23/07/11 - KD
-        String twitteruname=(st.getUser().getScreenName());
+        String lists=(st.getUser().getScreenName());
 
-        jTextPane1.setText(twitteruname.toUpperCase()+": "+st.getText());
+        jTextPane1.setText(lists.toUpperCase()+": "+st.getText());
         return this;
 }
-
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -50,13 +47,9 @@ public class Item extends javax.swing.JPanel implements ListCellRenderer{
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
 
-        setBackground(new java.awt.Color(204, 204, 255));
-        setForeground(new java.awt.Color(255, 255, 255));
-        setFont(new java.awt.Font("Tahoma", 1, 11));
         setPreferredSize(new java.awt.Dimension(550, 50));
 
-        jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
-        jScrollPane1.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jScrollPane1.setBackground(new java.awt.Color(204, 204, 255));
         jScrollPane1.setPreferredSize(new java.awt.Dimension(548, 50));
 
         jTextPane1.setBackground(new java.awt.Color(204, 102, 255));
@@ -69,13 +62,11 @@ public class Item extends javax.swing.JPanel implements ListCellRenderer{
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 556, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
