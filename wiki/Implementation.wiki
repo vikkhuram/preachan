@@ -3,5 +3,12 @@
 
 = Implementation=
 <pre> 
-A So far this project uses JPA, JAX-RS and JAXB
+So far this project uses JPA, JAX-RS and JAXB
+
+The UI uses Java SWING.
+Tweets are collected and added to a jEditPane, which in turn is added to a jPanel.
+
+This jPanel is then added as an item to a  jList which in turn is added to a jScrollPane.
+
+The other UI elements consist of jPanels, jToggleButtons, jButtons, jTextFields etc...
 </pre>
