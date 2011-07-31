@@ -3,8 +3,8 @@
 
 = Agile Team Backlog =
 <pre>
-1 GET statuses/home_timeline
-2 GET statuses/mentions
+~~1 GET statuses/home_timeline~~
+~~2 GET statuses/mentions~~
 3 GET statuses/public_timeline
 4 GET statuses/retweeted_by_me
 5 GET statuses/retweeted_to_me
