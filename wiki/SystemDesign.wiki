@@ -2,16 +2,5 @@
 #labels Phase-Design
 
 = Introduction =
-* A
-* B
-* C
+Here is a great Screencast that shows exactly how RESTful Web Services work. [http://netbeans.org/kb/docs/websvc/pet-catalog-screencast.html Screencast]
 
-=Architecture =
-*A
-*B
-*C
-
-= GUI =
-* A
-* B
-*C
