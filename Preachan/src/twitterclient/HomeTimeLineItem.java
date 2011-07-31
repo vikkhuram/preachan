@@ -19,7 +19,7 @@ import twitter.twitteroauth.twitterresponse.StatusType;
  *
  * @author Kevin Doyle
  */
-public class HomeTimeLineItem extends javax.swing.JPanel implements ListCellRenderer{
+public class HomeTimeLineItem extends javax.swing.JPanel implements ListCellRenderer  {
 
     /** Creates new form HomeTimeLineItem */
     public HomeTimeLineItem() {
@@ -28,13 +28,16 @@ public class HomeTimeLineItem extends javax.swing.JPanel implements ListCellRend
 
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean sel, boolean focus) {
-
+        //create a reference to my tweet parser
+        TweetParser tp = new TweetParser();
 
         StatusType st = (StatusType) value;
         //put the username into the text box with the txt message 23/07/11 - KD
         String twitteruname=(st.getUser().getScreenName());
 
-        jTextPane1.setText(twitteruname.toUpperCase()+": "+st.getText());
+        //parse tweet for hyperlinks
+
+        jEPTweet.setText(tp.ParseTweet(twitteruname.toUpperCase().toString()+": "+st.getText().toString()));
         return this;
 }
 
@@ -47,40 +50,47 @@ public class HomeTimeLineItem extends javax.swing.JPanel implements ListCellRend
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextPane1 = new javax.swing.JTextPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jEPTweet = new javax.swing.JEditorPane();
 
         setBackground(new java.awt.Color(204, 204, 255));
         setForeground(new java.awt.Color(255, 255, 255));
-        setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        setFont(new java.awt.Font("Tahoma", 1, 11));
         setPreferredSize(new java.awt.Dimension(550, 50));
 
-        jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
-        jScrollPane1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(548, 50));
+        jScrollPane2.setOpaque(false);
+        jScrollPane2.setPreferredSize(new java.awt.Dimension(548, 50));
 
-        jTextPane1.setBackground(new java.awt.Color(204, 102, 255));
-        jTextPane1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jTextPane1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jTextPane1.setForeground(new java.awt.Color(255, 255, 255));
-        jTextPane1.setPreferredSize(new java.awt.Dimension(546, 20));
-        jScrollPane1.setViewportView(jTextPane1);
+        jEPTweet.setBackground(new java.awt.Color(204, 102, 255));
+        jEPTweet.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jEPTweet.setContentType("text/html");
+        jEPTweet.setEditable(false);
+        jEPTweet.setPreferredSize(new java.awt.Dimension(546, 20));
+        jEPTweet.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
+                jEPTweetHyperlinkUpdate(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jEPTweet);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jEPTweetHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEPTweetHyperlinkUpdate
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jEPTweetHyperlinkUpdate
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextPane jTextPane1;
+    private javax.swing.JEditorPane jEPTweet;
+    private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
 }

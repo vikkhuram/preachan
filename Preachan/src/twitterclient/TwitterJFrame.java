@@ -39,13 +39,15 @@ public class TwitterJFrame extends javax.swing.JFrame {
         private DefaultListModel ListsDeaultListModel = new DefaultListModel();
              /** Creates new form TwitterJFrame */
     public TwitterJFrame() {
-Timer t = new Timer("Twitter Updater`", false);
+
+
+     Timer t = new Timer("Twitter Updater`", false);
      t.scheduleAtFixedRate(new TimerTask() {
 
             @Override
             public void run(){
 
-                System.out.println("Timer Task is running");
+        System.out.println("Timer Task is running");
     try {//this gets the usertimeline
         //Call getUserTimeline, get a list of statuses, pass the most recent
     //status as a StatusType object, and display the text of that object
@@ -99,33 +101,8 @@ Timer t = new Timer("Twitter Updater`", false);
     catch (UniformInterfaceException ex) {
     System.out.println("Exception when calling getFriendsTimeline = " + ex.getResponse().getEntity(String.class));
     }
-/**
-      try {//this gets the direct messages
-        //Call getUserTimeline, get a list of statuses, pass the most recent
-    //status as a StatusType object, and display the text of that object
-    //in the JTextField
-        //Bring st back into scope at method level KD 15/07/11
 
-  //  Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
-        client.initOAuth();
-   //    Statuses response = client.getDirectMessagesToMe(Statuses.class, null, null, "20");
 
-        DirectMessagesDeaultListModel.clear();
-        // Create a Status Type object for every status in the Status list, and add an element
-        // to the list model for every status type object
-     //   for (final StatusType st : response.getStatus()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                public void run() {
-                    DirectMessagesDeaultListModel.addElement(st);
-                }
-            });
-        }
-    }
-    catch (UniformInterfaceException ex) {
-    System.out.println("Exception when calling getFriendsTimeline = " + ex.getResponse().getEntity(String.class));
-    }
-**/
       try {//this gets the Lists
           //  Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
         client.initOAuth();
@@ -202,14 +179,14 @@ Timer t = new Timer("Twitter Updater`", false);
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLayeredPane1 = new javax.swing.JLayeredPane();
-        jSPLists = new javax.swing.JScrollPane();
-        jLLists = new javax.swing.JList();
-        jSPDirectMessages = new javax.swing.JScrollPane();
-        jLDirectMessage = new javax.swing.JList();
         jSPHomeTimeLine = new javax.swing.JScrollPane();
         jLHomeTimeLine = new javax.swing.JList();
         jSPMentions = new javax.swing.JScrollPane();
         jLMentions = new javax.swing.JList();
+        jSPDirectMessages = new javax.swing.JScrollPane();
+        jLDirectMessage = new javax.swing.JList();
+        jSPLists = new javax.swing.JScrollPane();
+        jLLists = new javax.swing.JList();
         jPLoginPane = new javax.swing.JPanel();
         jTFToken = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -451,23 +428,10 @@ Timer t = new Timer("Twitter Updater`", false);
 
         jLayeredPane1.setBackground(new java.awt.Color(204, 0, 204));
         jLayeredPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("layer pane"));
-
-        jLLists.setModel(ListsDeaultListModel);
-        jLLists.setCellRenderer(new twitterclient.ListsItem());
-        jSPLists.setViewportView(jLLists);
-
-        jSPLists.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jSPLists, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jLDirectMessage.setModel(DirectMessagesDeaultListModel);
-        jLDirectMessage.setCellRenderer(new twitterclient.DirectMessageItem());
-        jSPDirectMessages.setViewportView(jLDirectMessage);
-
-        jSPDirectMessages.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jSPDirectMessages, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setNextFocusableComponent(jSPHomeTimeLine);
 
         jSPHomeTimeLine.setForeground(new java.awt.Color(204, 204, 255));
-        jSPHomeTimeLine.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jSPHomeTimeLine.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jSPHomeTimeLine.setPreferredSize(new java.awt.Dimension(570, 360));
 
         jLHomeTimeLine.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -486,6 +450,20 @@ Timer t = new Timer("Twitter Updater`", false);
 
         jSPMentions.setBounds(10, 20, 570, 360);
         jLayeredPane1.add(jSPMentions, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jLDirectMessage.setModel(DirectMessagesDeaultListModel);
+        jLDirectMessage.setCellRenderer(new twitterclient.DirectMessageItem());
+        jSPDirectMessages.setViewportView(jLDirectMessage);
+
+        jSPDirectMessages.setBounds(10, 20, 570, 360);
+        jLayeredPane1.add(jSPDirectMessages, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jLLists.setModel(ListsDeaultListModel);
+        jLLists.setCellRenderer(new twitterclient.ListsItem());
+        jSPLists.setViewportView(jLLists);
+
+        jSPLists.setBounds(10, 20, 570, 360);
+        jLayeredPane1.add(jSPLists, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jPLoginPane.setBackground(new java.awt.Color(204, 0, 204));
         jPLoginPane.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -777,6 +755,7 @@ jTAStatusUpDate.setText(" ");
 private TwitterClient client;
 
 
+
     static class TwitterClient {
 
         private WebResource webResource;
@@ -833,11 +812,7 @@ private TwitterClient client;
             return webResource.path("/statuses/mentions.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
         }
 
-        // public <T> T getDirectMessagesToMe(Class<T> responseType, String since, String since_id, String page) throws UniformInterfaceException {
-          //  String[] queryParamNames = new String[]{"since", "since_id", "page"};
-           // String[] queryParamValues = new String[]{since, since_id, page};
-            //return webResource.path("direct_messages.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
-       // }
+
 
          public <T> T getAllLists(Class<T> responseType, String since, String since_id, String page) throws UniformInterfaceException {
             String[] queryParamNames = new String[]{"since", "since_id", "page"};
