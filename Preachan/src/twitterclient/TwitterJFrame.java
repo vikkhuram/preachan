@@ -7,14 +7,15 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ListIterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.HostnameVerifier;
@@ -23,6 +24,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
 import javax.ws.rs.core.MultivaluedMap;
 import twitter.twitteroauth.twitterresponse.StatusType;
 import twitter.twitteroauth.twitterresponse.Statuses;
@@ -32,14 +34,13 @@ import twitter.twitteroauth.twitterresponse.UserType;
  * @author Kevin Doyle
  */
 public class TwitterJFrame extends javax.swing.JFrame {
+Vector<String> v=new Vector();
+int x=0;
+String ss="<table border='1' width='100%'>";
 
-     private DefaultListModel homeTimeLineStatusesListModel = new DefaultListModel();
-     private DefaultListModel MentionsStatusesDeaultListModel = new DefaultListModel();
-      private DefaultListModel DirectMessagesDeaultListModel = new DefaultListModel();
-        private DefaultListModel ListsDeaultListModel = new DefaultListModel();
+
              /** Creates new form TwitterJFrame */
     public TwitterJFrame() {
-
 
      Timer t = new Timer("Twitter Updater`", false);
      t.scheduleAtFixedRate(new TimerTask() {
@@ -47,30 +48,34 @@ public class TwitterJFrame extends javax.swing.JFrame {
             @Override
             public void run(){
 
-        System.out.println("Timer Task is running");
-    try {//this gets the usertimeline
-        //Call getUserTimeline, get a list of statuses, pass the most recent
-    //status as a StatusType object, and display the text of that object
-    //in the JTextField
-        //Bring st back into scope at method level KD 15/07/11
-    StatusType stup = new StatusType();
-    Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
-    stup = statuses.getStatus().get(0);
-    jTACurrentStatus.setText(stup.getText().trim());
+       try {//this gets the usertimeline
         client.initOAuth();
         Statuses response = client.getFriendsTimeline(Statuses.class, null, null, null, "10");
-        // Clear the list model so it does not replicate the contents from the last run
-        homeTimeLineStatusesListModel.clear();
-        // Create a Status Type object for every status in the Status list, and add an element
-        // to the list model for every status type object
+//StatusType st = new StatusType();
+            // Clear the vector so it does not replicate the contents from the last run
+       //v.clear();
+
         for (final StatusType st : response.getStatus()) {
             SwingUtilities.invokeLater(new Runnable() {
                             @Override
                 public void run() {
-                    homeTimeLineStatusesListModel.addElement(st);
-                }
-            });
-        }
+                v.addElement(st.getText());
+                //ss=v.elementAt(v.size()-1);
+
+  }    });  }
+
+
+
+       //Call getUserTimeline, get a list of statuses, pass the most recent
+    //status as a StatusType object, and display the text of that object
+    //in the JTextField
+    //Bring st back into scope at method level KD 15/07/11
+    StatusType stup = new StatusType();
+    Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
+    stup = statuses.getStatus().get(1);
+    jTACurrentStatus.setText(stup.getText().trim());
+
+
     }
     catch (UniformInterfaceException ex) {
     System.out.println("Exception when calling getFriendsTimeline = " + ex.getResponse().getEntity(String.class));
@@ -86,14 +91,14 @@ public class TwitterJFrame extends javax.swing.JFrame {
         client.initOAuth();
      Statuses response = client.getMentions(Statuses.class, null, null, null, "10");
 
-        MentionsStatusesDeaultListModel.clear();
+      //  mentionsTimeline.clear();
         // Create a Status Type object for every status in the Status list, and add an element
         // to the list model for every status type object
         for (final StatusType st : response.getStatus()) {
             SwingUtilities.invokeLater(new Runnable() {
                             @Override
                 public void run() {
-                    MentionsStatusesDeaultListModel.addElement(st);
+           //         mentionsTimeline.addElement(st.toString());
                 }
             });
         }
@@ -103,30 +108,10 @@ public class TwitterJFrame extends javax.swing.JFrame {
     }
 
 
-      try {//this gets the Lists
-          //  Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
-        client.initOAuth();
-       Statuses response = client.getAllLists(Statuses.class, null, null, null);
 
-
-       ListsDeaultListModel .clear();
-        // Create a Status Type object for every status in the Status list, and add an element
-        // to the list model for every status type object
-        for (final StatusType st : response.getStatus()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                public void run() {
-                    ListsDeaultListModel .addElement(st);
-                }
-            });
-        }
-    }
-    catch (UniformInterfaceException ex) {
-    System.out.println("Exception when calling getFriendsTimeline = " + ex.getResponse().getEntity(String.class));
-    }
 
             }
-        }, 40000, 75000);
+        }, 40000, 75000);//initial once-off delay, period of execution
         initComponents();
         try {
         initUserInfo();
@@ -134,6 +119,8 @@ public class TwitterJFrame extends javax.swing.JFrame {
         Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
+
+
 
     //removed main function from here.
     /**
@@ -160,7 +147,6 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jLUserIcon = new javax.swing.JLabel();
         jLTwitterHandle = new javax.swing.JLabel();
         jLCurrentStatus = new javax.swing.JLabel();
-        jBTLogin = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTACurrentStatus = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
@@ -179,19 +165,8 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLayeredPane1 = new javax.swing.JLayeredPane();
-        jSPHomeTimeLine = new javax.swing.JScrollPane();
-        jLHomeTimeLine = new javax.swing.JList();
-        jSPMentions = new javax.swing.JScrollPane();
-        jLMentions = new javax.swing.JList();
-        jSPDirectMessages = new javax.swing.JScrollPane();
-        jLDirectMessage = new javax.swing.JList();
-        jSPLists = new javax.swing.JScrollPane();
-        jLLists = new javax.swing.JList();
-        jPLoginPane = new javax.swing.JPanel();
-        jTFToken = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        jPProfile = new javax.swing.JPanel();
-        jPSearch = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jEditorPane1 = new javax.swing.JEditorPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("___ Project Preáchán___");
@@ -209,14 +184,6 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jLTwitterHandle.setText("Twitter Handle");
 
         jLCurrentStatus.setText("Status:");
-
-        jBTLogin.setText("Twitter Login");
-        jBTLogin.setEnabled(false);
-        jBTLogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBTLoginActionPerformed(evt);
-            }
-        });
 
         jTACurrentStatus.setBackground(new java.awt.Color(204, 204, 204));
         jTACurrentStatus.setColumns(20);
@@ -236,18 +203,15 @@ public class TwitterJFrame extends javax.swing.JFrame {
             jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPPhotoHandleLayout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLTwitterHandle)
                     .addGroup(jPPhotoHandleLayout.createSequentialGroup()
-                        .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLCurrentStatus)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLTwitterHandle)
-                            .addGroup(jPPhotoHandleLayout.createSequentialGroup()
-                                .addComponent(jLCurrentStatus)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(jBTLogin))
-                .addContainerGap(99, Short.MAX_VALUE))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(164, Short.MAX_VALUE))
         );
         jPPhotoHandleLayout.setVerticalGroup(
             jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -261,9 +225,7 @@ public class TwitterJFrame extends javax.swing.JFrame {
                             .addComponent(jLCurrentStatus)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
-                .addComponent(jBTLogin)
-                .addContainerGap())
+                .addContainerGap(54, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -380,7 +342,7 @@ public class TwitterJFrame extends javax.swing.JFrame {
                         .addComponent(jLTweet)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 512, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(94, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -397,6 +359,7 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         String path = "C:/Documents and Settings/Kevin Doyle/My Documents/NetBeansProjects/TwitterUIDesign/src/UI/logo.gif";
         jPanel4.add(new JLabel(new ImageIcon(path)));
+        jPanel4.setEnabled(false);
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/logo.gif"))); // NOI18N
@@ -428,116 +391,22 @@ public class TwitterJFrame extends javax.swing.JFrame {
 
         jLayeredPane1.setBackground(new java.awt.Color(204, 0, 204));
         jLayeredPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("layer pane"));
-        jLayeredPane1.setNextFocusableComponent(jSPHomeTimeLine);
 
-        jSPHomeTimeLine.setForeground(new java.awt.Color(204, 204, 255));
-        jSPHomeTimeLine.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jSPHomeTimeLine.setPreferredSize(new java.awt.Dimension(570, 360));
+        jScrollPane1.setBorder(null);
 
-        jLHomeTimeLine.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLHomeTimeLine.setForeground(new java.awt.Color(255, 255, 255));
-        jLHomeTimeLine.setModel(homeTimeLineStatusesListModel);
-        jLHomeTimeLine.setCellRenderer(new twitterclient.HomeTimeLineItem());
-        jLHomeTimeLine.setVisibleRowCount(20);
-        jSPHomeTimeLine.setViewportView(jLHomeTimeLine);
-
-        jSPHomeTimeLine.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jSPHomeTimeLine, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jLMentions.setModel(MentionsStatusesDeaultListModel);
-        jLMentions.setCellRenderer(new twitterclient.MentionsItem());
-        jSPMentions.setViewportView(jLMentions);
-
-        jSPMentions.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jSPMentions, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jLDirectMessage.setModel(DirectMessagesDeaultListModel);
-        jLDirectMessage.setCellRenderer(new twitterclient.DirectMessageItem());
-        jSPDirectMessages.setViewportView(jLDirectMessage);
-
-        jSPDirectMessages.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jSPDirectMessages, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jLLists.setModel(ListsDeaultListModel);
-        jLLists.setCellRenderer(new twitterclient.ListsItem());
-        jSPLists.setViewportView(jLLists);
-
-        jSPLists.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jSPLists, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jPLoginPane.setBackground(new java.awt.Color(204, 0, 204));
-        jPLoginPane.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jTFToken.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTFTokenActionPerformed(evt);
+        jEditorPane1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jEditorPane1.setContentType("text/html");
+        jEditorPane1.setEditable(false);
+        jEditorPane1.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
+                jEditorPane1HyperlinkUpdate(evt);
             }
         });
-        jTFToken.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jTFTokenKeyPressed(evt);
-            }
-        });
+        jScrollPane1.setViewportView(jEditorPane1);
 
-        jLabel4.setText("Enter Token Number");
-
-        javax.swing.GroupLayout jPLoginPaneLayout = new javax.swing.GroupLayout(jPLoginPane);
-        jPLoginPane.setLayout(jPLoginPaneLayout);
-        jPLoginPaneLayout.setHorizontalGroup(
-            jPLoginPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPLoginPaneLayout.createSequentialGroup()
-                .addGap(572, 572, 572)
-                .addGroup(jPLoginPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jTFToken, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPLoginPaneLayout.setVerticalGroup(
-            jPLoginPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPLoginPaneLayout.createSequentialGroup()
-                .addContainerGap(106, Short.MAX_VALUE)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTFToken, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(205, 205, 205))
-        );
-
-        jPLoginPane.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jPLoginPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jPProfile.setBackground(new java.awt.Color(51, 153, 255));
-        jPProfile.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        javax.swing.GroupLayout jPProfileLayout = new javax.swing.GroupLayout(jPProfile);
-        jPProfile.setLayout(jPProfileLayout);
-        jPProfileLayout.setHorizontalGroup(
-            jPProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 566, Short.MAX_VALUE)
-        );
-        jPProfileLayout.setVerticalGroup(
-            jPProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 356, Short.MAX_VALUE)
-        );
-
-        jPProfile.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jPProfile, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jPSearch.setBackground(new java.awt.Color(51, 255, 204));
-        jPSearch.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        javax.swing.GroupLayout jPSearchLayout = new javax.swing.GroupLayout(jPSearch);
-        jPSearch.setLayout(jPSearchLayout);
-        jPSearchLayout.setHorizontalGroup(
-            jPSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 566, Short.MAX_VALUE)
-        );
-        jPSearchLayout.setVerticalGroup(
-            jPSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 356, Short.MAX_VALUE)
-        );
-
-        jPSearch.setBounds(10, 20, 570, 360);
-        jLayeredPane1.add(jPSearch, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jScrollPane1.setBounds(10, 20, 640, 360);
+        jLayeredPane1.add(jScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -553,7 +422,7 @@ public class TwitterJFrame extends javax.swing.JFrame {
                             .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLayeredPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 593, Short.MAX_VALUE)
+                            .addComponent(jLayeredPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE)
                             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -588,7 +457,13 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jToggleBMessages.setSelected(false);
         jToggleBProfiles.setSelected(false);
         jToggleBSearch.setSelected(false);
-        jLayeredPane1.moveToFront(jSPHomeTimeLine);
+        for(x=0;x<10;x++){
+ss+="<tr><td>"+v.get(x)+"</td></tr>";
+}
+
+ss+="</table>";
+jEditorPane1.setText(ss);
+
     }//GEN-LAST:event_jToggleBTimeLineActionPerformed
 
     private void jToggleBMentionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBMentionsActionPerformed
@@ -598,56 +473,29 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jToggleBMessages.setSelected(false);
         jToggleBProfiles.setSelected(false);
         jToggleBSearch.setSelected(false);
-        jLayeredPane1.moveToFront(jSPMentions);
+
 
     }//GEN-LAST:event_jToggleBMentionsActionPerformed
 
     private void jToggleBMessagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBMessagesActionPerformed
         // TODO add your handling code here:
-         jToggleBLists.setSelected(false);
-        jToggleBMentions.setSelected(false);
-        jToggleBTimeLine.setSelected(false);
-        jToggleBProfiles.setSelected(false);
-        jToggleBSearch.setSelected(false);
-        jLayeredPane1.moveToFront(jSPDirectMessages);
 
     }//GEN-LAST:event_jToggleBMessagesActionPerformed
 
     private void jToggleBListsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBListsActionPerformed
         // TODO add your handling code here:
-         jToggleBTimeLine.setSelected(false);
-        jToggleBMentions.setSelected(false);
-        jToggleBMessages.setSelected(false);
-        jToggleBProfiles.setSelected(false);
-        jToggleBSearch.setSelected(false);
-       jLayeredPane1.moveToFront(jSPLists);
+
     }//GEN-LAST:event_jToggleBListsActionPerformed
 
     private void jToggleBProfilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBProfilesActionPerformed
         // TODO add your handling code here:
-         jToggleBLists.setSelected(false);
-        jToggleBMentions.setSelected(false);
-        jToggleBMessages.setSelected(false);
-        jToggleBTimeLine.setSelected(false);
-        jToggleBSearch.setSelected(false);
-        jLayeredPane1.moveToFront(jPProfile);
+
     }//GEN-LAST:event_jToggleBProfilesActionPerformed
 
     private void jToggleBSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBSearchActionPerformed
         // TODO add your handling code here:
-         jToggleBLists.setSelected(false);
-        jToggleBMentions.setSelected(false);
-        jToggleBMessages.setSelected(false);
-        jToggleBProfiles.setSelected(false);
-        jToggleBTimeLine.setSelected(false);
-        jLayeredPane1.moveToFront(jPSearch);
+
     }//GEN-LAST:event_jToggleBSearchActionPerformed
-
-    private void jBTLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTLoginActionPerformed
-        // TODO add your handling code here:
-
-
-    }//GEN-LAST:event_jBTLoginActionPerformed
 
     private void jBPublishTweetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPublishTweetActionPerformed
        String rawStatus = jTAStatusUpDate.getText().trim();
@@ -664,18 +512,17 @@ public class TwitterJFrame extends javax.swing.JFrame {
 jTAStatusUpDate.setText(" ");
     }//GEN-LAST:event_jBPublishTweetActionPerformed
 
-    private void jTFTokenKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTFTokenKeyPressed
+    private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
+        HyperlinkEvent.EventType type = evt.getEventType();
+final URL url = evt.getURL();
         // TODO add your handling code here:
-        int key = evt.getKeyCode();
-        if (key == KeyEvent.VK_ENTER) {
-         jLayeredPane1.moveToBack(jPLoginPane);
-        }
+         StatusType st = new StatusType();
+        //put the username into the text box with the txt message 23/07/11 - KD
+        String twitteruname=(st.getUser().getScreenName());
 
-    }//GEN-LAST:event_jTFTokenKeyPressed
-
-    private void jTFTokenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFTokenActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTFTokenActionPerformed
+        //parse tweet for hyperlinks
+        jLabel1.setText(twitteruname.toUpperCase()+": "+st.getText());
+    }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
     private void initUserInfo() throws MalformedURLException, IOException {
 
@@ -716,35 +563,23 @@ jTAStatusUpDate.setText(" ");
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBPublishTweet;
-    private javax.swing.JButton jBTLogin;
+    private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JLabel jLCurrentStatus;
-    private javax.swing.JList jLDirectMessage;
-    private javax.swing.JList jLHomeTimeLine;
-    private javax.swing.JList jLLists;
-    private javax.swing.JList jLMentions;
     private javax.swing.JLabel jLTweet;
     private javax.swing.JLabel jLTwitterHandle;
     private javax.swing.JLabel jLUserIcon;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLayeredPane jLayeredPane1;
-    private javax.swing.JPanel jPLoginPane;
     private javax.swing.JPanel jPPhotoHandle;
-    private javax.swing.JPanel jPProfile;
-    private javax.swing.JPanel jPSearch;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jSPDirectMessages;
-    private javax.swing.JScrollPane jSPHomeTimeLine;
-    private javax.swing.JScrollPane jSPLists;
-    private javax.swing.JScrollPane jSPMentions;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTACurrentStatus;
     private javax.swing.JTextArea jTAStatusUpDate;
-    private javax.swing.JTextField jTFToken;
     private javax.swing.JToggleButton jToggleBLists;
     private javax.swing.JToggleButton jToggleBMentions;
     private javax.swing.JToggleButton jToggleBMessages;
@@ -780,11 +615,13 @@ private TwitterClient client;
          * Please, specify the consumer_secret string obtained from service API pages
          */
         private static final String CONSUMER_SECRET = "85zAfuclWgW7cZTmgqVUq2JEicD6kV6sCOH6SIIZU";
+      //  private String oauth_verifier;//retriev from dialog
         private OAuthParameters oauth_params;
         private OAuthSecrets oauth_secrets;
         private OAuthClientFilter oauth_filter;
         private String oauth_access_token;
         private String oauth_access_token_secret;
+
 
         //public void setResourcePath(String format) {
           //  String resourcePath = java.text.MessageFormat.format("statuses/user_timeline.{0}", new Object[]{format});
@@ -913,7 +750,8 @@ private TwitterClient client;
             }
            java.io.BufferedReader br = null;
             String oauth_verifier = null;
-            try {
+          //  oauth_verifier=oauth_verifier2;
+          try {
                 br = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
                 System.out.print("Type oauth_verifier string (taken from callback page url):");
                 oauth_verifier = br.readLine();

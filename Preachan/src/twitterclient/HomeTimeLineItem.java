@@ -36,8 +36,8 @@ public class HomeTimeLineItem extends javax.swing.JPanel implements ListCellRend
         String twitteruname=(st.getUser().getScreenName());
 
         //parse tweet for hyperlinks
+        jLabel1.setText(tp.ParseTweet(twitteruname.toUpperCase().toString()+": "+st.getText().toString()));
 
-        jEPTweet.setText(tp.ParseTweet(twitteruname.toUpperCase().toString()+": "+st.getText().toString()));
         return this;
 }
 
@@ -50,39 +50,33 @@ public class HomeTimeLineItem extends javax.swing.JPanel implements ListCellRend
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jEPTweet = new javax.swing.JEditorPane();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jEditorPane1 = new javax.swing.JEditorPane();
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
 
         setBackground(new java.awt.Color(204, 204, 255));
         setForeground(new java.awt.Color(255, 255, 255));
-        setFont(new java.awt.Font("Tahoma", 1, 11));
+        setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         setPreferredSize(new java.awt.Dimension(550, 50));
 
-        jScrollPane2.setOpaque(false);
-        jScrollPane2.setPreferredSize(new java.awt.Dimension(548, 50));
+        jLabel1.setText("jLabel1");
+        add(jLabel1);
 
-        jEPTweet.setBackground(new java.awt.Color(204, 102, 255));
-        jEPTweet.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jEPTweet.setContentType("text/html");
-        jEPTweet.setEditable(false);
-        jEPTweet.setPreferredSize(new java.awt.Dimension(546, 20));
-        jEPTweet.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
-            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
-                jEPTweetHyperlinkUpdate(evt);
-            }
-        });
-        jScrollPane2.setViewportView(jEPTweet);
+        jScrollPane1.setViewportView(jEditorPane1);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-        );
+        add(jScrollPane1);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jEPTweetHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEPTweetHyperlinkUpdate
@@ -90,7 +84,9 @@ public class HomeTimeLineItem extends javax.swing.JPanel implements ListCellRend
     }//GEN-LAST:event_jEPTweetHyperlinkUpdate
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JEditorPane jEPTweet;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JEditorPane jEditorPane1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }
