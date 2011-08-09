@@ -7,37 +7,63 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
+import java.awt.Color;
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ListIterator;
 import java.util.Timer;
+import java.util.StringTokenizer;
 import java.util.TimerTask;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.Document;
 import javax.ws.rs.core.MultivaluedMap;
 import twitter.twitteroauth.twitterresponse.StatusType;
 import twitter.twitteroauth.twitterresponse.Statuses;
 import twitter.twitteroauth.twitterresponse.UserType;
-
 /**
  * @author Kevin Doyle
  */
 public class TwitterJFrame extends javax.swing.JFrame {
-Vector<String> v=new Vector();
-int x=0;
-String ss="<table border='1' width='100%'>";
+StringBuilder strStatus= new StringBuilder();
 
+private void  parseTweet(){
+          StringBuilder str = new StringBuilder ("<table border='1' width='100%'>");
+         str.append(strStatus);
+        str.append("</table>");
+
+ String tokenisedTextString="";
+       StringTokenizer st = new StringTokenizer(str.toString());
+
+    while(st.hasMoreTokens())
+    {
+       String key = st.nextToken();
+       if(key.startsWith("#")){
+       key="<a href='https://twitter.com/#!/search?q=%23"+key+"'>"+key+"</a>";
+       }
+       else if(key.startsWith("@")){
+       key="<a href='http://twitter.com/"+key+"'>"+key+"</a>";
+       }
+        else if(key.startsWith("http")){
+       key="<a href='"+key+"'>"+key+"</a>";
+       }
+       else if(key.startsWith("https")){
+       key="<a href='"+key+"'>"+key+"</a>";
+        }
+        tokenisedTextString+=key+" ";
+        jEditorPane1.setText(tokenisedTextString);
+    }
+}
 
              /** Creates new form TwitterJFrame */
     public TwitterJFrame() {
@@ -51,25 +77,20 @@ String ss="<table border='1' width='100%'>";
        try {//this gets the usertimeline
         client.initOAuth();
         Statuses response = client.getFriendsTimeline(Statuses.class, null, null, null, "10");
-//StatusType st = new StatusType();
-            // Clear the vector so it does not replicate the contents from the last run
-       //v.clear();
 
         for (final StatusType st : response.getStatus()) {
             SwingUtilities.invokeLater(new Runnable() {
                             @Override
                 public void run() {
-                v.addElement(st.getText());
-                //ss=v.elementAt(v.size()-1);
-
+                strStatus.append("<tr><td>");
+                strStatus.append(st.getText());
+                 strStatus.append("</tr></td>");
   }    });  }
 
 
 
        //Call getUserTimeline, get a list of statuses, pass the most recent
     //status as a StatusType object, and display the text of that object
-    //in the JTextField
-    //Bring st back into scope at method level KD 15/07/11
     StatusType stup = new StatusType();
     Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
     stup = statuses.getStatus().get(1);
@@ -82,23 +103,15 @@ String ss="<table border='1' width='100%'>";
     }
 
      try {//this gets the mentions timeline
-        //Call getUserTimeline, get a list of statuses, pass the most recent
-    //status as a StatusType object, and display the text of that object
-    //in the JTextField
-        //Bring st back into scope at method level KD 15/07/11
 
-  //  Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
         client.initOAuth();
      Statuses response = client.getMentions(Statuses.class, null, null, null, "10");
 
-      //  mentionsTimeline.clear();
-        // Create a Status Type object for every status in the Status list, and add an element
-        // to the list model for every status type object
-        for (final StatusType st : response.getStatus()) {
+          for (final StatusType st : response.getStatus()) {
             SwingUtilities.invokeLater(new Runnable() {
                             @Override
                 public void run() {
-           //         mentionsTimeline.addElement(st.toString());
+
                 }
             });
         }
@@ -106,9 +119,6 @@ String ss="<table border='1' width='100%'>";
     catch (UniformInterfaceException ex) {
     System.out.println("Exception when calling getFriendsTimeline = " + ex.getResponse().getEntity(String.class));
     }
-
-
-
 
             }
         }, 40000, 75000);//initial once-off delay, period of execution
@@ -119,8 +129,6 @@ String ss="<table border='1' width='100%'>";
         Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
-
-
 
     //removed main function from here.
     /**
@@ -143,12 +151,7 @@ String ss="<table border='1' width='100%'>";
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPPhotoHandle = new javax.swing.JPanel();
-        jLUserIcon = new javax.swing.JLabel();
-        jLTwitterHandle = new javax.swing.JLabel();
-        jLCurrentStatus = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTACurrentStatus = new javax.swing.JTextArea();
+        jPBaseLayer = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jToggleBTimeLine = new javax.swing.JToggleButton();
         jToggleBMentions = new javax.swing.JToggleButton();
@@ -156,84 +159,34 @@ String ss="<table border='1' width='100%'>";
         jToggleBLists = new javax.swing.JToggleButton();
         jToggleBProfiles = new javax.swing.JToggleButton();
         jToggleBSearch = new javax.swing.JToggleButton();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jPPhotoHandle = new javax.swing.JPanel();
+        jLUserIcon = new javax.swing.JLabel();
+        jLTwitterHandle = new javax.swing.JLabel();
+        jLCurrentStatus = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTACurrentStatus = new javax.swing.JTextArea();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jEditorPane1 = new javax.swing.JEditorPane();
         jPanel3 = new javax.swing.JPanel();
         jBPublishTweet = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTAStatusUpDate = new javax.swing.JTextArea();
         jLTweet = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jLayeredPane1 = new javax.swing.JLayeredPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jEditorPane1 = new javax.swing.JEditorPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("___ Project Preáchán___");
 
-        jPPhotoHandle.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLUserIcon.setText("icon");
-        jLUserIcon.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 255)));
-        jLUserIcon.setMaximumSize(new java.awt.Dimension(48, 48));
-        jLUserIcon.setMinimumSize(new java.awt.Dimension(48, 48));
-        jLUserIcon.setPreferredSize(new java.awt.Dimension(48, 48));
-
-        jLTwitterHandle.setFont(new java.awt.Font("Tahoma", 1, 14));
-        jLTwitterHandle.setForeground(new java.awt.Color(0, 0, 255));
-        jLTwitterHandle.setText("Twitter Handle");
-
-        jLCurrentStatus.setText("Status:");
-
-        jTACurrentStatus.setBackground(new java.awt.Color(204, 204, 204));
-        jTACurrentStatus.setColumns(20);
-        jTACurrentStatus.setEditable(false);
-        jTACurrentStatus.setFont(new java.awt.Font("Monospaced", 1, 13));
-        jTACurrentStatus.setForeground(new java.awt.Color(255, 255, 255));
-        jTACurrentStatus.setLineWrap(true);
-        jTACurrentStatus.setRows(2);
-        jTACurrentStatus.setAutoscrolls(false);
-        jTACurrentStatus.setDisabledTextColor(new java.awt.Color(255, 255, 255));
-        jTACurrentStatus.setFocusable(false);
-        jScrollPane3.setViewportView(jTACurrentStatus);
-
-        javax.swing.GroupLayout jPPhotoHandleLayout = new javax.swing.GroupLayout(jPPhotoHandle);
-        jPPhotoHandle.setLayout(jPPhotoHandleLayout);
-        jPPhotoHandleLayout.setHorizontalGroup(
-            jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPPhotoHandleLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLTwitterHandle)
-                    .addGroup(jPPhotoHandleLayout.createSequentialGroup()
-                        .addComponent(jLCurrentStatus)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(164, Short.MAX_VALUE))
-        );
-        jPPhotoHandleLayout.setVerticalGroup(
-            jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPPhotoHandleLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPPhotoHandleLayout.createSequentialGroup()
-                        .addComponent(jLTwitterHandle)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLCurrentStatus)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(54, Short.MAX_VALUE))
-        );
+        jPBaseLayer.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setMaximumSize(new java.awt.Dimension(3276, 32767));
 
         jToggleBTimeLine.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_time_line.gif"))); // NOI18N
         jToggleBTimeLine.setText("Time Line");
-        jToggleBTimeLine.setSelected(true);
+        jToggleBTimeLine.setSelected(false);
         jToggleBTimeLine.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jToggleBTimeLineActionPerformed(evt);
@@ -284,16 +237,27 @@ String ss="<table border='1' width='100%'>";
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jToggleBTimeLine, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-                    .addComponent(jToggleBMentions, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-                    .addComponent(jToggleBLists, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-                    .addComponent(jToggleBSearch, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-                    .addComponent(jToggleBProfiles, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-                    .addComponent(jToggleBMessages, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jToggleBTimeLine, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jToggleBMentions, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jToggleBMessages, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jToggleBLists, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jToggleBProfiles, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jToggleBSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -310,8 +274,107 @@ String ss="<table border='1' width='100%'>";
                 .addComponent(jToggleBProfiles)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToggleBSearch)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        String path = "C:/Documents and Settings/Kevin Doyle/My Documents/NetBeansProjects/TwitterUIDesign/src/UI/logo.gif";
+        jPanel4.add(new JLabel(new ImageIcon(path)));
+        jPanel4.setEnabled(false);
+
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/logo.gif"))); // NOI18N
+
+        jLabel1.setText("Kevin Doyle © 2011");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(62, 62, 62)
+                .addComponent(jLabel2)
+                .addContainerGap(57, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap(46, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(43, 43, 43))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addGap(11, 11, 11)
+                .addComponent(jLabel1))
+        );
+
+        jPPhotoHandle.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLUserIcon.setText("icon");
+        jLUserIcon.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 255)));
+        jLUserIcon.setMaximumSize(new java.awt.Dimension(48, 48));
+        jLUserIcon.setMinimumSize(new java.awt.Dimension(48, 48));
+        jLUserIcon.setPreferredSize(new java.awt.Dimension(48, 48));
+
+        jLTwitterHandle.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jLTwitterHandle.setForeground(new java.awt.Color(0, 0, 255));
+        jLTwitterHandle.setText("Twitter Handle");
+
+        jLCurrentStatus.setText("Status:");
+
+        jTACurrentStatus.setBackground(new java.awt.Color(204, 204, 204));
+        jTACurrentStatus.setColumns(20);
+        jTACurrentStatus.setEditable(false);
+        jTACurrentStatus.setFont(new java.awt.Font("Monospaced", 1, 13));
+        jTACurrentStatus.setForeground(new java.awt.Color(255, 255, 255));
+        jTACurrentStatus.setLineWrap(true);
+        jTACurrentStatus.setRows(2);
+        jTACurrentStatus.setAutoscrolls(false);
+        jTACurrentStatus.setDisabledTextColor(new java.awt.Color(255, 255, 255));
+        jTACurrentStatus.setFocusable(false);
+        jScrollPane3.setViewportView(jTACurrentStatus);
+
+        javax.swing.GroupLayout jPPhotoHandleLayout = new javax.swing.GroupLayout(jPPhotoHandle);
+        jPPhotoHandle.setLayout(jPPhotoHandleLayout);
+        jPPhotoHandleLayout.setHorizontalGroup(
+            jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPPhotoHandleLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLTwitterHandle)
+                    .addGroup(jPPhotoHandleLayout.createSequentialGroup()
+                        .addComponent(jLCurrentStatus)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(83, Short.MAX_VALUE))
+        );
+        jPPhotoHandleLayout.setVerticalGroup(
+            jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPPhotoHandleLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPPhotoHandleLayout.createSequentialGroup()
+                        .addComponent(jLTwitterHandle)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLCurrentStatus)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jEditorPane1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jEditorPane1.setContentType("text/html");
+        jEditorPane1.setEditable(false);
+        jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
+                jEditorPane1HyperlinkUpdate(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jEditorPane1);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -342,7 +405,7 @@ String ss="<table border='1' width='100%'>";
                         .addComponent(jLTweet)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 512, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(94, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -353,117 +416,72 @@ String ss="<table border='1' width='100%'>";
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jBPublishTweet)
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        String path = "C:/Documents and Settings/Kevin Doyle/My Documents/NetBeansProjects/TwitterUIDesign/src/UI/logo.gif";
-        jPanel4.add(new JLabel(new ImageIcon(path)));
-        jPanel4.setEnabled(false);
-
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/logo.gif"))); // NOI18N
-
-        jLabel1.setText("Kevin Doyle © 2011");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(35, 35, 35)
-                        .addComponent(jLabel2))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jLabel1)))
-                .addContainerGap(68, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPBaseLayerLayout = new javax.swing.GroupLayout(jPBaseLayer);
+        jPBaseLayer.setLayout(jPBaseLayerLayout);
+        jPBaseLayerLayout.setHorizontalGroup(
+            jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPBaseLayerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
-                .addComponent(jLabel1))
+                .addGroup(jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPPhotoHandle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPBaseLayerLayout.createSequentialGroup()
+                        .addGroup(jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPBaseLayerLayout.createSequentialGroup()
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(9, 9, 9))
+                            .addGroup(jPBaseLayerLayout.createSequentialGroup()
+                                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addGroup(jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
-
-        jLayeredPane1.setBackground(new java.awt.Color(204, 0, 204));
-        jLayeredPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("layer pane"));
-
-        jScrollPane1.setBorder(null);
-
-        jEditorPane1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jEditorPane1.setContentType("text/html");
-        jEditorPane1.setEditable(false);
-        jEditorPane1.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-        jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
-            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
-                jEditorPane1HyperlinkUpdate(evt);
-            }
-        });
-        jScrollPane1.setViewportView(jEditorPane1);
-
-        jScrollPane1.setBounds(10, 20, 640, 360);
-        jLayeredPane1.add(jScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jPBaseLayerLayout.setVerticalGroup(
+            jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPBaseLayerLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jPPhotoHandle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPBaseLayerLayout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPBaseLayerLayout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 373, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(45, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPPhotoHandle, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLayeredPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPBaseLayer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPPhotoHandle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(42, 42, 42)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(84, 84, 84))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLayeredPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
-                        .addContainerGap())))
+            .addComponent(jPBaseLayer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-
-        jLayeredPane1.getAccessibleContext().setAccessibleName("layered pane");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jToggleBTimeLineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBTimeLineActionPerformed
-        // TODO add your handling code here:
-        jToggleBLists.setSelected(false);
-        jToggleBMentions.setSelected(false);
-        jToggleBMessages.setSelected(false);
-        jToggleBProfiles.setSelected(false);
-        jToggleBSearch.setSelected(false);
-        for(x=0;x<10;x++){
-ss+="<tr><td>"+v.get(x)+"</td></tr>";
-}
-
-ss+="</table>";
-jEditorPane1.setText(ss);
-
+            // TODO add your handling code here:
+            jToggleBLists.setSelected(false);
+            jToggleBMentions.setSelected(false);
+            jToggleBMessages.setSelected(false);
+            jToggleBProfiles.setSelected(false);
+            jToggleBSearch.setSelected(false);
+            jEditorPane1.setContentType("text/html");
+            jEditorPane1.setBackground(Color.white);
+            parseTweet();
     }//GEN-LAST:event_jToggleBTimeLineActionPerformed
 
     private void jToggleBMentionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBMentionsActionPerformed
@@ -473,28 +491,42 @@ jEditorPane1.setText(ss);
         jToggleBMessages.setSelected(false);
         jToggleBProfiles.setSelected(false);
         jToggleBSearch.setSelected(false);
-
-
     }//GEN-LAST:event_jToggleBMentionsActionPerformed
 
     private void jToggleBMessagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBMessagesActionPerformed
         // TODO add your handling code here:
-
+    jToggleBLists.setSelected(false);
+   jToggleBTimeLine.setSelected(false);
+   jToggleBMentions.setSelected(false);
+   jToggleBProfiles.setSelected(false);
+     jToggleBSearch.setSelected(false);
     }//GEN-LAST:event_jToggleBMessagesActionPerformed
 
     private void jToggleBListsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBListsActionPerformed
         // TODO add your handling code here:
-
+   jToggleBTimeLine.setSelected(false);
+   jToggleBMentions.setSelected(false);
+       jToggleBMessages.setSelected(false);
+        jToggleBProfiles.setSelected(false);
+        jToggleBSearch.setSelected(false);
     }//GEN-LAST:event_jToggleBListsActionPerformed
 
     private void jToggleBProfilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBProfilesActionPerformed
         // TODO add your handling code here:
-
+    jToggleBTimeLine.setSelected(false);
+       jToggleBMentions.setSelected(false);
+       jToggleBMessages.setSelected(false);
+       jToggleBLists.setSelected(false);
+       jToggleBSearch.setSelected(false);
     }//GEN-LAST:event_jToggleBProfilesActionPerformed
 
     private void jToggleBSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBSearchActionPerformed
         // TODO add your handling code here:
-
+       jToggleBTimeLine.setSelected(false);
+       jToggleBMentions.setSelected(false);
+       jToggleBMessages.setSelected(false);
+       jToggleBLists.setSelected(false);
+       jToggleBProfiles.setSelected(false);
     }//GEN-LAST:event_jToggleBSearchActionPerformed
 
     private void jBPublishTweetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPublishTweetActionPerformed
@@ -512,26 +544,38 @@ jEditorPane1.setText(ss);
 jTAStatusUpDate.setText(" ");
     }//GEN-LAST:event_jBPublishTweetActionPerformed
 
-    private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
-        HyperlinkEvent.EventType type = evt.getEventType();
-final URL url = evt.getURL();
-        // TODO add your handling code here:
-         StatusType st = new StatusType();
-        //put the username into the text box with the txt message 23/07/11 - KD
-        String twitteruname=(st.getUser().getScreenName());
+private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
+    HyperlinkEvent.EventType type = evt.getEventType();
+    final URL url = evt.getURL();
 
-        //parse tweet for hyperlinks
-        jLabel1.setText(twitteruname.toUpperCase()+": "+st.getText());
-    }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
+    if (type == HyperlinkEvent.EventType.ACTIVATED) {
+        Runnable runner = new Runnable() {
 
-    private void initUserInfo() throws MalformedURLException, IOException {
+            @Override
+            public void run() {
+
+// Retain reference to original
+                Document doc = jEditorPane1.getDocument();
+                try {
+                    jEditorPane1.setPage(url);
+                } catch (IOException ioException) {
+                    JOptionPane.showMessageDialog(null, "Error following link",
+                            "Invalid link", JOptionPane.ERROR_MESSAGE);
+                    jEditorPane1.setDocument(doc);
+                }
+            }
+        };
+        EventQueue.invokeLater(runner);
+    }
+}//GEN-LAST:event_jEditorPane1HyperlinkUpdate
+
+
+private void initUserInfo() throws MalformedURLException, IOException {
 
     //Create an instance of the internal service class
     client = new TwitterClient();
     //Bring st back into scope at method level KD 15/07/11
     StatusType st = new StatusType();
-
-
 
     //Log in, get tokens, and append the tokens to the consumer and secret
     //keys
@@ -540,7 +584,6 @@ final URL url = evt.getURL();
 
     client.initOAuth();
 
-
     //Call getUserTimeline, get a list of statuses, pass the most recent
     //status as a StatusType object, and display the text of that object
     //in the JTextField
@@ -548,8 +591,6 @@ final URL url = evt.getURL();
     st = statuses.getStatus().get(0);
     //try decoding the text before showing it in the ui 22/07/11 - KD
     jTACurrentStatus.setText(st.getText().trim());
-
-
 
     //Get a UserType object from the StatusType object, get the URL of that
     //user's icon, and display that icon in the JLabel
@@ -570,7 +611,7 @@ final URL url = evt.getURL();
     private javax.swing.JLabel jLUserIcon;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLayeredPane jLayeredPane1;
+    private javax.swing.JPanel jPBaseLayer;
     private javax.swing.JPanel jPPhotoHandle;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
@@ -588,8 +629,6 @@ final URL url = evt.getURL();
     private javax.swing.JToggleButton jToggleBTimeLine;
     // End of variables declaration//GEN-END:variables
 private TwitterClient client;
-
-
 
     static class TwitterClient {
 
@@ -622,7 +661,6 @@ private TwitterClient client;
         private String oauth_access_token;
         private String oauth_access_token_secret;
 
-
         //public void setResourcePath(String format) {
           //  String resourcePath = java.text.MessageFormat.format("statuses/user_timeline.{0}", new Object[]{format});
             //webResource = client.resource(BASE_URI).path(resourcePath);
@@ -648,8 +686,6 @@ private TwitterClient client;
             String[] queryParamValues = new String[]{since, since_id, page, "count"};
             return webResource.path("/statuses/mentions.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
         }
-
-
 
          public <T> T getAllLists(Class<T> responseType, String since, String since_id, String page) throws UniformInterfaceException {
             String[] queryParamNames = new String[]{"since", "since_id", "page"};
