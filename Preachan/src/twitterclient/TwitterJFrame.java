@@ -12,6 +12,7 @@ import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Timer;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.swing.ImageIcon;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -31,121 +33,102 @@ import javax.ws.rs.core.MultivaluedMap;
 import twitter.twitteroauth.twitterresponse.StatusType;
 import twitter.twitteroauth.twitterresponse.Statuses;
 import twitter.twitteroauth.twitterresponse.UserType;
+import javax.swing.text.Document;
+
+
 /**
  * @author Kevin Doyle
+ * @email  kfrdoyle[at]gmail[dot]com
  */
 public class TwitterJFrame extends javax.swing.JFrame {
-StringBuilder strStatus= new StringBuilder();
 
-private void  parseTweet(){
-          StringBuilder str = new StringBuilder ("<table border='1' width='100%'>");
-         str.append(strStatus);
-        str.append("</table>");
+StringBuilder strGetFriendsTimeline= new StringBuilder();
+static URL oAuthURL=null;//comes from inner class AthoriseConsumer method
+static URL oldURL=null;
+ static Form requestTokenResponse=null;
 
- String tokenisedTextString="";
-       StringTokenizer st = new StringTokenizer(str.toString());
-
-    while(st.hasMoreTokens())
-    {
-       String key = st.nextToken();
-       if(key.startsWith("#")){
-       key="<a href='https://twitter.com/#!/search?q=%23"+key+"'>"+key+"</a>";
-       }
-       else if(key.startsWith("@")){
-       key="<a href='http://twitter.com/"+key+"'>"+key+"</a>";
-       }
-        else if(key.startsWith("http")){
-       key="<a href='"+key+"'>"+key+"</a>";
-       }
-       else if(key.startsWith("https")){
-       key="<a href='"+key+"'>"+key+"</a>";
-        }
-        tokenisedTextString+=key+" ";
-        jEditorPane1.setText(tokenisedTextString);
-    }
-}
-
-             /** Creates new form TwitterJFrame */
     public TwitterJFrame() {
+        System.out.println("In TwitterJFrame Constructor");
+        /** TwitterJFrame class constructor */
+        initComponents(); //Step (1)
+        toggleUIButtons(false);//disable UI Buttons
 
-     Timer t = new Timer("Twitter Updater`", false);
-     t.scheduleAtFixedRate(new TimerTask() {
-
+        java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
-            public void run(){
-
-       try {//this gets the usertimeline
-        client.initOAuth();
-        Statuses response = client.getFriendsTimeline(Statuses.class, null, null, null, "10");
-
-        for (final StatusType st : response.getStatus()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                public void run() {
-                strStatus.append("<tr><td>");
-                strStatus.append(st.getText());
-                 strStatus.append("</tr></td>");
-  }    });  }
-
-
-
-       //Call getUserTimeline, get a list of statuses, pass the most recent
-    //status as a StatusType object, and display the text of that object
-    StatusType stup = new StatusType();
-    Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
-    stup = statuses.getStatus().get(1);
-    jTACurrentStatus.setText(stup.getText().trim());
-
-
-    }
-    catch (UniformInterfaceException ex) {
-    System.out.println("Exception when calling getFriendsTimeline = " + ex.getResponse().getEntity(String.class));
-    }
-
-     try {//this gets the mentions timeline
-
-        client.initOAuth();
-     Statuses response = client.getMentions(Statuses.class, null, null, null, "10");
-
-          for (final StatusType st : response.getStatus()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                public void run() {
-
-                }
-            });
-        }
-    }
-    catch (UniformInterfaceException ex) {
-    System.out.println("Exception when calling getFriendsTimeline = " + ex.getResponse().getEntity(String.class));
-    }
-
+            public void run() {
+                collectLoginData(); //Step (2)
             }
-        }, 40000, 75000);//initial once-off delay, period of execution
-        initComponents();
-        try {
-        initUserInfo();
-    } catch (IOException ex) {
-        Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    }
+        });
 
-    //removed main function from here.
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-       java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    loadAWebPage(); //Step (3)
+                } catch (IOException ex) {
+                    Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+
+/**
+        try {
+            loginUser(); //OAuth Login only, dont retrieve resourses yet
+           System.out.println("After call to loginUser method");
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+**/
+
+    }    /**End of TwitterJFrame class constructor**/
+
+      public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                new TwitterJFrame().setVisible(true); } });
+                System.out.println("In main");
+                new TwitterJFrame().setVisible(true);
+            }
+        });
     }
 
+    private void collectLoginData() {
+        System.out.println("In collectLoginData Method");
+        client = new TwitterClient();
+        try {
+            client.login();
+//             System.out.println("After client.login method local ststic variableURL=: "+oAuthURL.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UniformInterfaceException ex) {
+            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+      private  void loadAWebPage() throws IOException{
+          System.out.println("In start of loadAWebPage method");
+
+          oldURL=oAuthURL;//keep old url for back button
+    URL url =new URL(oAuthURL.toString());
+    Document doc =jEPWeb.getDocument();
+      try {
+        jEPWeb.setPage(url);
+      } catch (IOException ioException) {
+        System.out.println("Error following link");
+
+        jEPWeb.setDocument(doc);
+      }
+      System.out.println("Exiting LoadAWebPage method");
+}
+
+
     /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+     * initialize the form.WARNING: Do NOT modify this code. The content
+     * of this method is always regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -165,24 +148,33 @@ private void  parseTweet(){
         jPPhotoHandle = new javax.swing.JPanel();
         jLUserIcon = new javax.swing.JLabel();
         jLTwitterHandle = new javax.swing.JLabel();
-        jLCurrentStatus = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTACurrentStatus = new javax.swing.JTextArea();
+        jLStatusLabel = new javax.swing.JLabel();
+        jLLatestTweet = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jEditorPane1 = new javax.swing.JEditorPane();
-        jPanel3 = new javax.swing.JPanel();
-        jBPublishTweet = new javax.swing.JButton();
+        jEPWeb = new javax.swing.JEditorPane();
+        jLayeredPane1 = new javax.swing.JLayeredPane();
+        jPGetVerifierNum = new javax.swing.JPanel();
+        jTFrequestTokenResponse = new javax.swing.JTextField();
+        jBGotRequestToken = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jPTweetStatusUpdate = new javax.swing.JPanel();
+        jButton2 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTAStatusUpDate = new javax.swing.JTextArea();
-        jLTweet = new javax.swing.JLabel();
+        jTextArea1 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("___ Project Preáchán___");
+        setTitle("___ Project Preachan___");
 
-        jPBaseLayer.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPBaseLayer.setBackground(new java.awt.Color(51, 51, 255));
+        jPBaseLayer.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        jPBaseLayer.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        System.out.println("In initComponents method");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.setBackground(new java.awt.Color(102, 153, 255));
+        jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
         jPanel1.setMaximumSize(new java.awt.Dimension(3276, 32767));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jToggleBTimeLine.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_time_line.gif"))); // NOI18N
         jToggleBTimeLine.setText("Time Line");
@@ -192,6 +184,7 @@ private void  parseTweet(){
                 jToggleBTimeLineActionPerformed(evt);
             }
         });
+        jPanel1.add(jToggleBTimeLine, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 12, 190, -1));
 
         jToggleBMentions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_mentions.gif"))); // NOI18N
         jToggleBMentions.setText("Mentions");
@@ -200,6 +193,7 @@ private void  parseTweet(){
                 jToggleBMentionsActionPerformed(evt);
             }
         });
+        jPanel1.add(jToggleBMentions, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 59, 190, -1));
 
         jToggleBMessages.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_messages.gif"))); // NOI18N
         jToggleBMessages.setText("Messages");
@@ -208,6 +202,7 @@ private void  parseTweet(){
                 jToggleBMessagesActionPerformed(evt);
             }
         });
+        jPanel1.add(jToggleBMessages, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 106, 190, -1));
 
         jToggleBLists.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_lists.gif"))); // NOI18N
         jToggleBLists.setText("Lists");
@@ -216,6 +211,7 @@ private void  parseTweet(){
                 jToggleBListsActionPerformed(evt);
             }
         });
+        jPanel1.add(jToggleBLists, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 153, 190, -1));
 
         jToggleBProfiles.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_profile.gif"))); // NOI18N
         jToggleBProfiles.setText("Profile");
@@ -224,6 +220,7 @@ private void  parseTweet(){
                 jToggleBProfilesActionPerformed(evt);
             }
         });
+        jPanel1.add(jToggleBProfiles, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 200, 190, -1));
 
         jToggleBSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_search.gif"))); // NOI18N
         jToggleBSearch.setText("Search");
@@ -232,86 +229,28 @@ private void  parseTweet(){
                 jToggleBSearchActionPerformed(evt);
             }
         });
+        jPanel1.add(jToggleBSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 247, 190, -1));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jToggleBTimeLine, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jToggleBMentions, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jToggleBMessages, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jToggleBLists, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jToggleBProfiles, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jToggleBSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
-                        .addContainerGap())))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jToggleBTimeLine)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jToggleBMentions)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jToggleBMessages)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jToggleBLists)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jToggleBProfiles)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jToggleBSearch)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jPBaseLayer.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 217, 302));
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        String path = "C:/Documents and Settings/Kevin Doyle/My Documents/NetBeansProjects/TwitterUIDesign/src/UI/logo.gif";
-        jPanel4.add(new JLabel(new ImageIcon(path)));
+        jPanel4.setBackground(new java.awt.Color(102, 153, 255));
+        jPanel4.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
         jPanel4.setEnabled(false);
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/logo.gif"))); // NOI18N
+        jPanel4.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(66, 12, -1, -1));
 
         jLabel1.setText("Kevin Doyle © 2011");
+        jPanel4.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 78, -1, -1));
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(62, 62, 62)
-                .addComponent(jLabel2)
-                .addContainerGap(57, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap(46, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(43, 43, 43))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel2)
-                .addGap(11, 11, 11)
-                .addComponent(jLabel1))
-        );
+        jPBaseLayer.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 420, 217, 150));
 
-        jPPhotoHandle.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPPhotoHandle.setBackground(new java.awt.Color(102, 153, 255));
+        jPPhotoHandle.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
 
-        jLUserIcon.setText("icon");
+        jLUserIcon.setText("photo");
         jLUserIcon.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 255)));
         jLUserIcon.setMaximumSize(new java.awt.Dimension(48, 48));
         jLUserIcon.setMinimumSize(new java.awt.Dimension(48, 48));
@@ -321,19 +260,13 @@ private void  parseTweet(){
         jLTwitterHandle.setForeground(new java.awt.Color(0, 0, 255));
         jLTwitterHandle.setText("Twitter Handle");
 
-        jLCurrentStatus.setText("Status:");
+        jLStatusLabel.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jLStatusLabel.setForeground(new java.awt.Color(0, 0, 255));
+        jLStatusLabel.setText("Status:");
 
-        jTACurrentStatus.setBackground(new java.awt.Color(204, 204, 204));
-        jTACurrentStatus.setColumns(20);
-        jTACurrentStatus.setEditable(false);
-        jTACurrentStatus.setFont(new java.awt.Font("Monospaced", 1, 13));
-        jTACurrentStatus.setForeground(new java.awt.Color(255, 255, 255));
-        jTACurrentStatus.setLineWrap(true);
-        jTACurrentStatus.setRows(2);
-        jTACurrentStatus.setAutoscrolls(false);
-        jTACurrentStatus.setDisabledTextColor(new java.awt.Color(255, 255, 255));
-        jTACurrentStatus.setFocusable(false);
-        jScrollPane3.setViewportView(jTACurrentStatus);
+        jLLatestTweet.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jLLatestTweet.setForeground(new java.awt.Color(0, 0, 255));
+        jLLatestTweet.setText("status");
 
         javax.swing.GroupLayout jPPhotoHandleLayout = new javax.swing.GroupLayout(jPPhotoHandle);
         jPPhotoHandle.setLayout(jPPhotoHandleLayout);
@@ -346,127 +279,149 @@ private void  parseTweet(){
                 .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLTwitterHandle)
                     .addGroup(jPPhotoHandleLayout.createSequentialGroup()
-                        .addComponent(jLCurrentStatus)
+                        .addComponent(jLStatusLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(83, Short.MAX_VALUE))
+                        .addComponent(jLLatestTweet)))
+                .addContainerGap(997, Short.MAX_VALUE))
         );
         jPPhotoHandleLayout.setVerticalGroup(
             jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPPhotoHandleLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPPhotoHandleLayout.createSequentialGroup()
+                        .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
                     .addGroup(jPPhotoHandleLayout.createSequentialGroup()
                         .addComponent(jLTwitterHandle)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLCurrentStatus)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLUserIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                        .addGroup(jPPhotoHandleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLStatusLabel)
+                            .addComponent(jLLatestTweet))
+                        .addContainerGap(13, Short.MAX_VALUE))))
         );
 
-        jEditorPane1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jEditorPane1.setContentType("text/html");
-        jEditorPane1.setEditable(false);
-        jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+        jPBaseLayer.add(jPPhotoHandle, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 13, -1, -1));
+
+        jScrollPane1.setBorder(null);
+
+        jEPWeb.setBackground(new java.awt.Color(204, 204, 255));
+        jEPWeb.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        jEPWeb.setContentType("text/html");
+        jEPWeb.setEditable(false);
+        jEPWeb.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
-                jEditorPane1HyperlinkUpdate(evt);
+                jEPWebHyperlinkUpdate(evt);
             }
         });
-        jScrollPane1.setViewportView(jEditorPane1);
+        jScrollPane1.setViewportView(jEPWeb);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPBaseLayer.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 100, 940, 470));
 
-        jBPublishTweet.setText("Publish Your Tweet!");
-        jBPublishTweet.addActionListener(new java.awt.event.ActionListener() {
+        jLayeredPane1.setBackground(new java.awt.Color(255, 255, 102));
+        jLayeredPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jTFrequestTokenResponse.setFont(new java.awt.Font("Tahoma", 1, 14));
+
+        jBGotRequestToken.setText("OK");
+        jBGotRequestToken.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBPublishTweetActionPerformed(evt);
+                jBGotRequestTokenActionPerformed(evt);
             }
         });
 
-        jTAStatusUpDate.setColumns(20);
-        jTAStatusUpDate.setLineWrap(true);
-        jTAStatusUpDate.setRows(2);
-        jTAStatusUpDate.setAutoscrolls(false);
-        jScrollPane2.setViewportView(jTAStatusUpDate);
+        jLabel5.setText("Enter 8 digit number, then click [OK]");
 
-        jLTweet.setText("Tweet:");
+        jButton1.setText("<<Back");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPGetVerifierNumLayout = new javax.swing.GroupLayout(jPGetVerifierNum);
+        jPGetVerifierNum.setLayout(jPGetVerifierNumLayout);
+        jPGetVerifierNumLayout.setHorizontalGroup(
+            jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPGetVerifierNumLayout.createSequentialGroup()
+                .addGap(341, 341, 341)
+                .addGroup(jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTFrequestTokenResponse, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(18, 18, 18)
+                .addComponent(jBGotRequestToken, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(107, 107, 107)
+                .addComponent(jButton1)
+                .addContainerGap(404, Short.MAX_VALUE))
+        );
+        jPGetVerifierNumLayout.setVerticalGroup(
+            jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPGetVerifierNumLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jBPublishTweet)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLTweet)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 512, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLTweet)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBPublishTweet)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jLabel5)
+                .addGap(3, 3, 3)
+                .addGroup(jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTFrequestTokenResponse, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBGotRequestToken, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPBaseLayerLayout = new javax.swing.GroupLayout(jPBaseLayer);
-        jPBaseLayer.setLayout(jPBaseLayerLayout);
-        jPBaseLayerLayout.setHorizontalGroup(
-            jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPBaseLayerLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPPhotoHandle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPBaseLayerLayout.createSequentialGroup()
-                        .addGroup(jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPBaseLayerLayout.createSequentialGroup()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(9, 9, 9))
-                            .addGroup(jPBaseLayerLayout.createSequentialGroup()
-                                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                        .addGroup(jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(29, Short.MAX_VALUE))
+        jPGetVerifierNum.setBounds(0, 0, 1170, 80);
+        jLayeredPane1.add(jPGetVerifierNum, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_tweet.gif"))); // NOI18N
+        jButton2.setText("  Tweet!");
+        jButton2.setMaximumSize(new java.awt.Dimension(104, 41));
+        jButton2.setMinimumSize(new java.awt.Dimension(104, 41));
+        jButton2.setPreferredSize(new java.awt.Dimension(101, 41));
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setFont(new java.awt.Font("Monospaced", 1, 13)); // NOI18N
+        jTextArea1.setForeground(new java.awt.Color(0, 51, 204));
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(3);
+        jTextArea1.setToolTipText("120 Maximum characters");
+        jScrollPane2.setViewportView(jTextArea1);
+
+        javax.swing.GroupLayout jPTweetStatusUpdateLayout = new javax.swing.GroupLayout(jPTweetStatusUpdate);
+        jPTweetStatusUpdate.setLayout(jPTweetStatusUpdateLayout);
+        jPTweetStatusUpdateLayout.setHorizontalGroup(
+            jPTweetStatusUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPTweetStatusUpdateLayout.createSequentialGroup()
+                .addGap(230, 230, 230)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(222, Short.MAX_VALUE))
         );
-        jPBaseLayerLayout.setVerticalGroup(
-            jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPBaseLayerLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(jPPhotoHandle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPBaseLayerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPBaseLayerLayout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(30, 30, 30)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPBaseLayerLayout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 373, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(45, Short.MAX_VALUE))
+        jPTweetStatusUpdateLayout.setVerticalGroup(
+            jPTweetStatusUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPTweetStatusUpdateLayout.createSequentialGroup()
+                .addGroup(jPTweetStatusUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPTweetStatusUpdateLayout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPTweetStatusUpdateLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)))
+                .addContainerGap())
         );
+
+        jPTweetStatusUpdate.setBounds(0, 0, 1170, 79);
+        jLayeredPane1.add(jPTweetStatusUpdate, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jPBaseLayer.add(jLayeredPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 592, 1170, 80));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPBaseLayer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPBaseLayer, javax.swing.GroupLayout.DEFAULT_SIZE, 1196, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPBaseLayer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPBaseLayer, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
         );
 
         pack();
@@ -479,8 +434,8 @@ private void  parseTweet(){
             jToggleBMessages.setSelected(false);
             jToggleBProfiles.setSelected(false);
             jToggleBSearch.setSelected(false);
-            jEditorPane1.setContentType("text/html");
-            jEditorPane1.setBackground(Color.white);
+            jEPWeb.setContentType("text/html");
+            jEPWeb.setBackground(Color.white);
             parseTweet();
     }//GEN-LAST:event_jToggleBTimeLineActionPerformed
 
@@ -529,22 +484,7 @@ private void  parseTweet(){
        jToggleBProfiles.setSelected(false);
     }//GEN-LAST:event_jToggleBSearchActionPerformed
 
-    private void jBPublishTweetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPublishTweetActionPerformed
-       String rawStatus = jTAStatusUpDate.getText().trim();
-
-    client.makeOAuthRequestUnique();
-    try {
-
-        String status = URLEncoder.encode(rawStatus, "UTF-8" );
-    client.updateStatus(String.class, status, null);
-    } catch(UniformInterfaceException ex){
-        System.out.println("Exception when calling updateStatus = " + ex.getResponse().getEntity(String.class));
-    }catch (UnsupportedEncodingException uee){}
-
-jTAStatusUpDate.setText(" ");
-    }//GEN-LAST:event_jBPublishTweetActionPerformed
-
-private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
+private void jEPWebHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEPWebHyperlinkUpdate
     HyperlinkEvent.EventType type = evt.getEventType();
     final URL url = evt.getURL();
 
@@ -553,74 +493,154 @@ private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
 
             @Override
             public void run() {
-
-// Retain reference to original
-                Document doc = jEditorPane1.getDocument();
+                // Retain reference to original
+                Document doc = jEPWeb.getDocument();
                 try {
-                    jEditorPane1.setPage(url);
+                    jEPWeb.setPage(url);
                 } catch (IOException ioException) {
                     JOptionPane.showMessageDialog(null, "Error following link",
                             "Invalid link", JOptionPane.ERROR_MESSAGE);
-                    jEditorPane1.setDocument(doc);
+                    jEPWeb.setDocument(doc);
                 }
             }
         };
         EventQueue.invokeLater(runner);
     }
-}//GEN-LAST:event_jEditorPane1HyperlinkUpdate
+}//GEN-LAST:event_jEPWebHyperlinkUpdate
 
 
-private void initUserInfo() throws MalformedURLException, IOException {
 
-    //Create an instance of the internal service class
-    client = new TwitterClient();
-    //Bring st back into scope at method level KD 15/07/11
-    StatusType st = new StatusType();
+private void jBGotRequestTokenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGotRequestTokenActionPerformed
+        System.out.println("In OK button clicked after getting number");
+        try {
+            client.oauth_verifier2=jTFrequestTokenResponse.getText();
+            client.login_phase_2(requestTokenResponse);
+                jTFrequestTokenResponse.setText("");//clear the text field
+                        toggleUIButtons(true);//enable UI Buttons
+                        jLayeredPane1.moveToFront(jPTweetStatusUpdate);
+                        initUserInfo();//start populating UI with account info
 
-    //Log in, get tokens, and append the tokens to the consumer and secret
-    //keys
+        } catch (IOException ex) {
+            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UniformInterfaceException ex) {
+            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+}//GEN-LAST:event_jBGotRequestTokenActionPerformed
 
-    client.login();
+private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+//History navigation button for travelling back in surfing time
+    URL url=null;
+        try {
+            url = new URL(oldURL.toString());
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    Document doc =jEPWeb.getDocument();
+      try {
+        jEPWeb.setPage(url);
+      } catch (IOException ioException) {
+        System.out.println("Error following link");
 
-    client.initOAuth();
+        jEPWeb.setDocument(doc);
+      }
+      System.out.println("Exiting LoadAWebPage method");
+}//GEN-LAST:event_jButton1ActionPerformed
 
-    //Call getUserTimeline, get a list of statuses, pass the most recent
-    //status as a StatusType object, and display the text of that object
-    //in the JTextField
-    Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
-    st = statuses.getStatus().get(0);
-    //try decoding the text before showing it in the ui 22/07/11 - KD
-    jTACurrentStatus.setText(st.getText().trim());
+     /***
+     * @param toggleYN Allows Enable/Disable of UI Components
+     * @return void
+     */
+private void toggleUIButtons(boolean toggleYN){
+    System.out.println("In toggleButtons method");
+    boolean toggle=toggleYN;
+//jBPublishTweet.setEnabled(toggle);
+jToggleBLists.setEnabled(toggle);
+jToggleBMentions.setEnabled(toggle);
+jToggleBMessages.setEnabled(toggle);
+jToggleBProfiles.setEnabled(toggle);
+jToggleBSearch.setEnabled(toggle);
+jToggleBTimeLine.setEnabled(toggle);
 
-    //Get a UserType object from the StatusType object, get the URL of that
-    //user's icon, and display that icon in the JLabel
-    UserType user = st.getUser();
-    String iconSrc = user.getProfileImageUrl();
-    URL iconUrl = new URL(iconSrc);
-    ImageIcon icon = new ImageIcon(iconUrl, user.getScreenName());
-    jLUserIcon.setIcon(icon);
-    jLTwitterHandle.setText(user.getScreenName());
+}
+private void  parseTweet(){
+          StringBuilder str = new StringBuilder ("<table border='1' width='100%'>");
+         str.append(strGetFriendsTimeline);
+        str.append("</table>");
+
+ String tokenisedTextString="";
+       StringTokenizer st = new StringTokenizer(str.toString());
+
+    while(st.hasMoreTokens())
+    {
+       String key = st.nextToken();
+       if(key.startsWith("#")){
+       key="<a href='https://twitter.com/#!/search?q=%23"+key+"'>"+key+"</a>";
+       }
+       else if(key.startsWith("@")){
+       key="<a href='http://twitter.com/"+key+"'>"+key+"</a>";
+       }
+        else if(key.startsWith("http")){
+       key="<a href='"+key+"'>"+key+"</a>";
+       }
+       else if(key.startsWith("https")){
+       key="<a href='"+key+"'>"+key+"</a>";
+        }
+        tokenisedTextString+=key+" ";
+        jEPWeb.setText(tokenisedTextString);
+    }
 }
 
+
+
+
+    private void initUserInfo() throws MalformedURLException, IOException {
+        System.out.println("In InitUserInfo Method");
+
+        //Bring st back into scope at method level KD 15/07/11
+        StatusType st = new StatusType();
+        //Log in, get tokens, and append the tokens to the consumer and secret keys
+        client.initOAuth();
+        //Call getUserTimeline, get a list of statuses, pass the most recent
+        //status as a StatusType object, and display the text of that object
+        //in the JTextField
+         Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
+         st = statuses.getStatus().get(0);
+        //try decoding the text before showing it in the ui 22/07/11 - KD
+        jLLatestTweet.setText(st.getText().trim());
+
+        //Get a UserType object from the StatusType object, get the URL of that
+        //user's icon, and display that icon in the JLabel
+          UserType user = st.getUser();
+          String iconSrc = user.getProfileImageUrl();
+          URL iconUrl = new URL(iconSrc);
+          ImageIcon icon = new ImageIcon(iconUrl, user.getScreenName());
+          jLUserIcon.setIcon(icon);
+          jLTwitterHandle.setText(user.getScreenName());
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBPublishTweet;
-    private javax.swing.JEditorPane jEditorPane1;
-    private javax.swing.JLabel jLCurrentStatus;
-    private javax.swing.JLabel jLTweet;
+    private javax.swing.JButton jBGotRequestToken;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JEditorPane jEPWeb;
+    private javax.swing.JLabel jLLatestTweet;
+    private javax.swing.JLabel jLStatusLabel;
     private javax.swing.JLabel jLTwitterHandle;
     private javax.swing.JLabel jLUserIcon;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JPanel jPBaseLayer;
+    private javax.swing.JPanel jPGetVerifierNum;
     private javax.swing.JPanel jPPhotoHandle;
+    private javax.swing.JPanel jPTweetStatusUpdate;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextArea jTACurrentStatus;
-    private javax.swing.JTextArea jTAStatusUpDate;
+    private javax.swing.JTextField jTFrequestTokenResponse;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JToggleButton jToggleBLists;
     private javax.swing.JToggleButton jToggleBMentions;
     private javax.swing.JToggleButton jToggleBMessages;
@@ -628,7 +648,11 @@ private void initUserInfo() throws MalformedURLException, IOException {
     private javax.swing.JToggleButton jToggleBSearch;
     private javax.swing.JToggleButton jToggleBTimeLine;
     // End of variables declaration//GEN-END:variables
-private TwitterClient client;
+    /**
+     * private TwitterClient client This points to the class below and gives
+     * us access to a static TwitterClient object in memory
+     */
+    private TwitterClient client;
 
     static class TwitterClient {
 
@@ -637,9 +661,10 @@ private TwitterClient client;
         private static final String BASE_URI = "https://twitter.com";
 
         public TwitterClient() {
+           System.out.println("In TwitterClient InnerClass Constructor");
             com.sun.jersey.api.client.config.ClientConfig config = new com.sun.jersey.api.client.config.DefaultClientConfig(); // SSL configuration
             config.getProperties().put(com.sun.jersey.client.urlconnection.HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new com.sun.jersey.client.urlconnection.HTTPSProperties(getHostnameVerifier(), getSSLContext()));
-            client = Client.create(config);
+              client = Client.create(config);
             String resourcePath = "statuses";
             //change this as not all resources are a status
              //webResource = client.resource(BASE_URI).path(resourcePath);
@@ -660,6 +685,8 @@ private TwitterClient client;
         private OAuthClientFilter oauth_filter;
         private String oauth_access_token;
         private String oauth_access_token_secret;
+        String oauth_verifier2=null;//taken from webpage via OK button event
+
 
         //public void setResourcePath(String format) {
           //  String resourcePath = java.text.MessageFormat.format("statuses/user_timeline.{0}", new Object[]{format});
@@ -707,7 +734,7 @@ private TwitterClient client;
             return webResource.path("/statuses/update.xml").type(javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED).post(responseType, getQueryOrFormParams(formParamNames, formParamValues));
         }
         private MultivaluedMap getQueryOrFormParams(String[] paramNames, String[] paramValues) {
-            MultivaluedMap<String, String> qParams = new com.sun.jersey.api.representation.Form();
+            MultivaluedMap<String, String> qParams = new com.sun.jersey.api.representation.Form();//Debug this String String
             for (int i = 0; i < paramNames.length; i++) {
                 if (paramValues[i] != null) {
                     qParams.add(paramNames[i], paramValues[i]);
@@ -725,14 +752,27 @@ private TwitterClient client;
          * The method obtains the OAuth access token string, that is appended to each API request later.
          */
         public void login() throws IOException, UniformInterfaceException {
+
             Form requestTokenResponse = getOAuthRequestToken();
-            String oauth_verifier = authorizeConsumer(requestTokenResponse);
+            System.out.println("In login method phase 1 requestTokenResponse "+requestTokenResponse.toString());
+            TwitterJFrame.requestTokenResponse=requestTokenResponse;//pass rTR to outter class so outer class can call loginPhase2
+            String temp=getOAuthURL(requestTokenResponse);//playing ball with Jersey just to rob oAuthURL
+            }
+
+            //seperate these here
+            public void login_phase_2(Form requestTokenResponse) throws IOException, UniformInterfaceException {
+            System.out.println("In login_phase_2");
+             String oauth_verifier = authorizeConsumer(requestTokenResponse);
+            System.out.println("oauth_verifier= "+oauth_verifier);
             Form accessTokenResponse = getOAuthAccessToken(requestTokenResponse, oauth_verifier);
+            System.out.println("OAuth Access Token= "+accessTokenResponse.toString());
             oauth_access_token_secret = accessTokenResponse.getFirst("oauth_token_secret");
             oauth_access_token = accessTokenResponse.getFirst("oauth_token");
+             System.out.println("oauth_access_token_secret= "+oauth_access_token_secret+" oauth_access_token= "+oauth_access_token);
         }
 
         private Form getOAuthRequestToken() throws UniformInterfaceException {
+            System.out.println("In client.getoAuthRequestToken method");
             WebResource resource = client.resource(OAUTH_BASE_URL).path("request_token");
             oauth_params = new OAuthParameters().consumerKey(CONSUMER_KEY).signatureMethod(com.sun.jersey.oauth.signature.HMAC_SHA1.NAME).version("1.0").nonce().timestamp();
             oauth_secrets = new OAuthSecrets().consumerSecret(CONSUMER_SECRET);
@@ -742,6 +782,7 @@ private TwitterClient client;
         }
 
         private Form getOAuthAccessToken(Form requestTokenResponse, String oauth_verifier) throws UniformInterfaceException {
+            System.out.println("In client.getoAuthAccessToken method");
             WebResource resource = client.resource(OAUTH_BASE_URL).path("access_token");
             oauth_params.token(requestTokenResponse.getFirst("oauth_token")).signatureMethod(com.sun.jersey.oauth.signature.HMAC_SHA1.NAME).version("1.0").nonce().timestamp().verifier(oauth_verifier);
             oauth_secrets.tokenSecret(requestTokenResponse.getFirst("oauth_token_secret"));
@@ -754,6 +795,7 @@ private TwitterClient client;
          * The method needs to be called after login() method, or when the webResource path is changed
          */
         public void initOAuth() {
+            System.out.println("In client.initoAuth method");
             oauth_params = new OAuthParameters().consumerKey(CONSUMER_KEY).token(oauth_access_token).signatureMethod(com.sun.jersey.oauth.signature.HMAC_SHA1.NAME).version("1.0").nonce().timestamp();
             oauth_secrets = new OAuthSecrets().consumerSecret(CONSUMER_SECRET).tokenSecret(oauth_access_token_secret);
             oauth_filter = new OAuthClientFilter(client.getProviders(), oauth_params, oauth_secrets);
@@ -773,31 +815,37 @@ private TwitterClient client;
          * </pre>
          */
         public void makeOAuthRequestUnique() {
+            System.out.println("In client.makeoAuthRequestsUnique method");
             if (oauth_params != null) {
+
                 oauth_params.nonce().timestamp();
             }
         }
 
-        private java.lang.String authorizeConsumer(Form requestTokenResponse) throws IOException {
+       private String getOAuthURL(Form requestTokenResponse)throws IOException{
+           URL url =null;
+           String strURLstr="";
 
             try {
-                java.awt.Desktop.getDesktop().browse(new java.net.URI("http://twitter.com/oauth/authorize?oauth_token=" + requestTokenResponse.getFirst("oauth_token")));
+              URI uri = new URI("http://twitter.com/oauth/authorize?oauth_token=" + requestTokenResponse.getFirst("oauth_token"));
+                 url = uri.toURL();
+                strURLstr=url.toString();
             } catch (java.net.URISyntaxException ex) {
             }
-           java.io.BufferedReader br = null;
-            String oauth_verifier = null;
-          //  oauth_verifier=oauth_verifier2;
-          try {
-                br = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
-                System.out.print("Type oauth_verifier string (taken from callback page url):");
-                oauth_verifier = br.readLine();
-            } finally {
-                br.close();
-            }
-            return oauth_verifier;
-        }
+            TwitterJFrame.oAuthURL=url;//transfer oAuthURL from inner class to outter class
+            System.out.println("In client.getOAuthURL url="+strURLstr);
+       return strURLstr;
+       }
+
+        private java.lang.String authorizeConsumer(Form requestTokenResponse) throws IOException {
+            String ov2=null;
+            ov2=oauth_verifier2;
+            System.out.println("In client.authoriseConnsumer method, oAuth VerifierNumber is: "+ov2);
+            return ov2;
+    }
 
         private HostnameVerifier getHostnameVerifier() {
+            System.out.println("In client.getHostnameVerifier method");
             return new HostnameVerifier() {
 
                 @Override
@@ -808,6 +856,7 @@ private TwitterClient client;
         }
 
         private SSLContext getSSLContext() {
+            System.out.println("In client.getSSLContext method");
             javax.net.ssl.TrustManager x509 = new javax.net.ssl.X509TrustManager() {
 
                 @Override
