@@ -1,5 +1,6 @@
 package twitterclient;
 
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -9,22 +10,24 @@ import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 import java.awt.EventQueue;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
 import javax.swing.ImageIcon;
+import javax.swing.text.Document;
 import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.ws.rs.core.MultivaluedMap;
 import twitter.twitteroauth.twitterresponse.StatusType;
 import twitter.twitteroauth.twitterresponse.Statuses;
 import twitter.twitteroauth.twitterresponse.UserType;
-import javax.swing.text.Document;
+
 
 /**
  * @author Kevin Doyle
@@ -137,9 +140,9 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jBHistoryBackButton = new javax.swing.JButton();
         jPTweetStatusUpdate = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
+        jBTweetATweet = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTANewTweet = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("___ Project Preachan___");
@@ -212,7 +215,7 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jLTwitterHandle.setForeground(new java.awt.Color(0, 0, 255));
         jLTwitterHandle.setText("Twitter Handle");
 
-        jLStatusLabel.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jLStatusLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLStatusLabel.setForeground(new java.awt.Color(0, 0, 255));
         jLStatusLabel.setText("Status:");
 
@@ -330,19 +333,24 @@ public class TwitterJFrame extends javax.swing.JFrame {
 
         jPTweetStatusUpdate.setBackground(new java.awt.Color(102, 153, 255));
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_tweet.gif"))); // NOI18N
-        jButton2.setText("  Tweet!");
-        jButton2.setMaximumSize(new java.awt.Dimension(104, 41));
-        jButton2.setMinimumSize(new java.awt.Dimension(104, 41));
-        jButton2.setPreferredSize(new java.awt.Dimension(101, 41));
+        jBTweetATweet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_tweet.gif"))); // NOI18N
+        jBTweetATweet.setText("  Tweet!");
+        jBTweetATweet.setMaximumSize(new java.awt.Dimension(104, 41));
+        jBTweetATweet.setMinimumSize(new java.awt.Dimension(104, 41));
+        jBTweetATweet.setPreferredSize(new java.awt.Dimension(101, 41));
+        jBTweetATweet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTweetATweetActionPerformed(evt);
+            }
+        });
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Monospaced", 1, 13));
-        jTextArea1.setForeground(new java.awt.Color(0, 51, 204));
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(3);
-        jTextArea1.setToolTipText("120 Maximum characters");
-        jScrollPane2.setViewportView(jTextArea1);
+        jTANewTweet.setColumns(20);
+        jTANewTweet.setFont(new java.awt.Font("Monospaced", 1, 13)); // NOI18N
+        jTANewTweet.setForeground(new java.awt.Color(0, 51, 204));
+        jTANewTweet.setLineWrap(true);
+        jTANewTweet.setRows(3);
+        jTANewTweet.setToolTipText("120 Maximum characters");
+        jScrollPane2.setViewportView(jTANewTweet);
 
         javax.swing.GroupLayout jPTweetStatusUpdateLayout = new javax.swing.GroupLayout(jPTweetStatusUpdate);
         jPTweetStatusUpdate.setLayout(jPTweetStatusUpdateLayout);
@@ -352,7 +360,7 @@ public class TwitterJFrame extends javax.swing.JFrame {
                 .addGap(230, 230, 230)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jBTweetATweet, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(222, Short.MAX_VALUE))
         );
         jPTweetStatusUpdateLayout.setVerticalGroup(
@@ -361,7 +369,7 @@ public class TwitterJFrame extends javax.swing.JFrame {
                 .addGroup(jPTweetStatusUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPTweetStatusUpdateLayout.createSequentialGroup()
                         .addGap(16, 16, 16)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jBTweetATweet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPTweetStatusUpdateLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)))
@@ -413,7 +421,6 @@ private void jEPWebHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-
 
 
 private void jBHistoryBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHistoryBackButtonActionPerformed
-
     //History navigation button for travelling back in surfing time
     URL url = null;
     try {
@@ -425,8 +432,9 @@ private void jBHistoryBackButtonActionPerformed(java.awt.event.ActionEvent evt) 
     try {
         jEPWeb.setPage(url);
     } catch (IOException ioException) {
-        System.out.println("Error following link");
 
+        JOptionPane.showMessageDialog(null, "Error following link",
+                "Error following link", JOptionPane.ERROR_MESSAGE);
         jEPWeb.setDocument(doc);
     }
 
@@ -440,21 +448,37 @@ private void jBTimeLineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 private void jBGotRequestTokenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGotRequestTokenActionPerformed
 // OK Button on get verifier code jPanel
- try {
-            client.oauth_verifier2=jTFrequestTokenResponse.getText();
-            client.login_phase_2(requestTokenResponse);
-                jTFrequestTokenResponse.setText("");//clear the text field
-                        toggleUIButtons(true);//enable UI Buttons
-                        jLayeredPane1.moveToFront(jPTweetStatusUpdate);
-                        jPGetVerifierNum.setVisible(false);
-                        initUserData();//start populating UI with account info
+    try {
+        client.oauth_verifier2 = jTFrequestTokenResponse.getText();
+        client.login_phase_2(requestTokenResponse);
+        jTFrequestTokenResponse.setText("");//clear the text field
+        toggleUIButtons(true);//enable UI Buttons
+        jLayeredPane1.moveToFront(jPTweetStatusUpdate);
+        jPGetVerifierNum.setVisible(false);
+        initUserData();//start populating UI with account info
 
-        } catch (IOException ex) {
-            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UniformInterfaceException ex) {
-            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    } catch (IOException ex) {
+        Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (UniformInterfaceException ex) {
+        Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+    }
 }//GEN-LAST:event_jBGotRequestTokenActionPerformed
+
+private void jBTweetATweetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTweetATweetActionPerformed
+// From the publish tweet button:
+    String rawStatus = jTANewTweet.getText().trim();
+
+    client.makeOAuthRequestUnique();
+    try {
+        String status = java.net.URLEncoder.encode(rawStatus, "UTF-8");
+        client.updateStatus(String.class, status, null);
+    } catch (UniformInterfaceException ex) {
+        JOptionPane.showMessageDialog(null, "Error following link",
+                "Exception when calling updateStatus = " + ex.getResponse().getEntity(String.class), JOptionPane.ERROR_MESSAGE);
+    } catch (UnsupportedEncodingException uee) {
+    }
+    jTANewTweet.setText(" ");
+}//GEN-LAST:event_jBTweetATweetActionPerformed
 
      /***
      * @param toggleYN Allows Enable/Disable of UI Components
@@ -541,7 +565,7 @@ private void toggleUIButtons(boolean toggleYN){
     private javax.swing.JButton jBProfile;
     private javax.swing.JButton jBSearch;
     private javax.swing.JButton jBTimeLine;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jBTweetATweet;
     private javax.swing.JEditorPane jEPWeb;
     private javax.swing.JLabel jLLatestTweet;
     private javax.swing.JLabel jLStatusLabel;
@@ -559,8 +583,8 @@ private void toggleUIButtons(boolean toggleYN){
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTANewTweet;
     private javax.swing.JTextField jTFrequestTokenResponse;
-    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
     /**
      * private TwitterClient client This points to the class below and gives
