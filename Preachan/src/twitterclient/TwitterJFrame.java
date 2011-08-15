@@ -7,34 +7,24 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
-import java.awt.Color;
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Timer;
 import java.util.StringTokenizer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.Document;
 import javax.ws.rs.core.MultivaluedMap;
 import twitter.twitteroauth.twitterresponse.StatusType;
 import twitter.twitteroauth.twitterresponse.Statuses;
 import twitter.twitteroauth.twitterresponse.UserType;
 import javax.swing.text.Document;
-
 
 /**
  * @author Kevin Doyle
@@ -42,18 +32,18 @@ import javax.swing.text.Document;
  */
 public class TwitterJFrame extends javax.swing.JFrame {
 
-StringBuilder strGetFriendsTimeline= new StringBuilder();
-static URL oAuthURL=null;//comes from inner class AthoriseConsumer method
-static URL oldURL=null;
- static Form requestTokenResponse=null;
+    static URL oAuthURL = null;//comes from inner class AthoriseConsumer method
+    static URL oldURL = null;//prevoius oAuth page on twitter
+    static Form requestTokenResponse = null;//Form object from twitter
 
     public TwitterJFrame() {
-        System.out.println("In TwitterJFrame Constructor");
         /** TwitterJFrame class constructor */
         initComponents(); //Step (1)
+
         toggleUIButtons(false);//disable UI Buttons
 
         java.awt.EventQueue.invokeLater(new Runnable() {
+
             @Override
             public void run() {
                 collectLoginData(); //Step (2)
@@ -61,6 +51,7 @@ static URL oldURL=null;
         });
 
         java.awt.EventQueue.invokeLater(new Runnable() {
+
             @Override
             public void run() {
                 try {
@@ -71,37 +62,26 @@ static URL oldURL=null;
             }
         });
 
+    }
+    /**End of TwitterJFrame class constructor**/
 
-/**
-        try {
-            loginUser(); //OAuth Login only, dont retrieve resourses yet
-           System.out.println("After call to loginUser method");
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-**/
-
-    }    /**End of TwitterJFrame class constructor**/
-
-      public static void main(String args[]) {
+    public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                System.out.println("In main");
                 new TwitterJFrame().setVisible(true);
             }
         });
     }
 
     private void collectLoginData() {
-        System.out.println("In collectLoginData Method");
+
         client = new TwitterClient();
+
         try {
             client.login();
-//             System.out.println("After client.login method local ststic variableURL=: "+oAuthURL.toString());
+
         } catch (IOException ex) {
             Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UniformInterfaceException ex) {
@@ -109,22 +89,20 @@ static URL oldURL=null;
         }
     }
 
-      private  void loadAWebPage() throws IOException{
-          System.out.println("In start of loadAWebPage method");
+    private void loadAWebPage() throws IOException {
 
-          oldURL=oAuthURL;//keep old url for back button
-    URL url =new URL(oAuthURL.toString());
-    Document doc =jEPWeb.getDocument();
-      try {
-        jEPWeb.setPage(url);
-      } catch (IOException ioException) {
-        System.out.println("Error following link");
+        oldURL = oAuthURL;//keep old url for back button
+        URL url = new URL(oAuthURL.toString());
+        Document doc = jEPWeb.getDocument();
+        try {
+            jEPWeb.setPage(url);
+        } catch (IOException ioException) {
+            System.out.println("Error following link");
 
-        jEPWeb.setDocument(doc);
-      }
-      System.out.println("Exiting LoadAWebPage method");
-}
+            jEPWeb.setDocument(doc);
+        }
 
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.WARNING: Do NOT modify this code. The content
@@ -136,12 +114,12 @@ static URL oldURL=null;
 
         jPBaseLayer = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jToggleBTimeLine = new javax.swing.JToggleButton();
-        jToggleBMentions = new javax.swing.JToggleButton();
-        jToggleBMessages = new javax.swing.JToggleButton();
-        jToggleBLists = new javax.swing.JToggleButton();
-        jToggleBProfiles = new javax.swing.JToggleButton();
-        jToggleBSearch = new javax.swing.JToggleButton();
+        jBMentions = new javax.swing.JButton();
+        jBMessages = new javax.swing.JButton();
+        jBLists = new javax.swing.JButton();
+        jBProfile = new javax.swing.JButton();
+        jBSearch = new javax.swing.JButton();
+        jBTimeLine = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -157,7 +135,7 @@ static URL oldURL=null;
         jTFrequestTokenResponse = new javax.swing.JTextField();
         jBGotRequestToken = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jBHistoryBackButton = new javax.swing.JButton();
         jPTweetStatusUpdate = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -176,62 +154,36 @@ static URL oldURL=null;
         jPanel1.setMaximumSize(new java.awt.Dimension(3276, 32767));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jToggleBTimeLine.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_time_line.gif"))); // NOI18N
-        jToggleBTimeLine.setText("Time Line");
-        jToggleBTimeLine.setSelected(false);
-        jToggleBTimeLine.addActionListener(new java.awt.event.ActionListener() {
+        jBMentions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_mentions.gif"))); // NOI18N
+        jBMentions.setText("Mentions");
+        jPanel1.add(jBMentions, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 170, -1));
+
+        jBMessages.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_messages.gif"))); // NOI18N
+        jBMessages.setText("Messages");
+        jPanel1.add(jBMessages, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 170, -1));
+
+        jBLists.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_lists.gif"))); // NOI18N
+        jBLists.setText("Lists");
+        jPanel1.add(jBLists, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 170, -1));
+
+        jBProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_profile.gif"))); // NOI18N
+        jBProfile.setText("Profile");
+        jPanel1.add(jBProfile, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 170, -1));
+
+        jBSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_search.gif"))); // NOI18N
+        jBSearch.setText("Search");
+        jPanel1.add(jBSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 260, 170, -1));
+
+        jBTimeLine.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_time_line.gif"))); // NOI18N
+        jBTimeLine.setText("Home Time Line");
+        jBTimeLine.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleBTimeLineActionPerformed(evt);
+                jBTimeLineActionPerformed(evt);
             }
         });
-        jPanel1.add(jToggleBTimeLine, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 12, 190, -1));
+        jPanel1.add(jBTimeLine, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 170, -1));
 
-        jToggleBMentions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_mentions.gif"))); // NOI18N
-        jToggleBMentions.setText("Mentions");
-        jToggleBMentions.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleBMentionsActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jToggleBMentions, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 59, 190, -1));
-
-        jToggleBMessages.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_messages.gif"))); // NOI18N
-        jToggleBMessages.setText("Messages");
-        jToggleBMessages.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleBMessagesActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jToggleBMessages, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 106, 190, -1));
-
-        jToggleBLists.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_lists.gif"))); // NOI18N
-        jToggleBLists.setText("Lists");
-        jToggleBLists.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleBListsActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jToggleBLists, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 153, 190, -1));
-
-        jToggleBProfiles.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_profile.gif"))); // NOI18N
-        jToggleBProfiles.setText("Profile");
-        jToggleBProfiles.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleBProfilesActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jToggleBProfiles, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 200, 190, -1));
-
-        jToggleBSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_search.gif"))); // NOI18N
-        jToggleBSearch.setText("Search");
-        jToggleBSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleBSearchActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jToggleBSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(11, 247, 190, -1));
-
-        jPBaseLayer.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 217, 302));
+        jPBaseLayer.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 217, 310));
 
         jPanel4.setBackground(new java.awt.Color(102, 153, 255));
         jPanel4.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
@@ -240,7 +192,7 @@ static URL oldURL=null;
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/logo.gif"))); // NOI18N
-        jPanel4.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(66, 12, -1, -1));
+        jPanel4.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 20, -1, -1));
 
         jLabel1.setText("Kevin Doyle © 2011");
         jPanel4.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 78, -1, -1));
@@ -264,7 +216,7 @@ static URL oldURL=null;
         jLStatusLabel.setForeground(new java.awt.Color(0, 0, 255));
         jLStatusLabel.setText("Status:");
 
-        jLLatestTweet.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jLLatestTweet.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLLatestTweet.setForeground(new java.awt.Color(0, 0, 255));
         jLLatestTweet.setText("status");
 
@@ -309,6 +261,9 @@ static URL oldURL=null;
         jEPWeb.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
         jEPWeb.setContentType("text/html");
         jEPWeb.setEditable(false);
+        jEPWeb.setDoubleBuffered(true);
+        jEPWeb.setDragEnabled(true);
+        jEPWeb.setFocusTraversalPolicyProvider(true);
         jEPWeb.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                 jEPWebHyperlinkUpdate(evt);
@@ -321,7 +276,10 @@ static URL oldURL=null;
         jLayeredPane1.setBackground(new java.awt.Color(255, 255, 102));
         jLayeredPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
+        jPGetVerifierNum.setBackground(new java.awt.Color(102, 153, 255));
+
         jTFrequestTokenResponse.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jTFrequestTokenResponse.setDragEnabled(true);
 
         jBGotRequestToken.setText("OK");
         jBGotRequestToken.addActionListener(new java.awt.event.ActionListener() {
@@ -332,10 +290,10 @@ static URL oldURL=null;
 
         jLabel5.setText("Enter 8 digit number, then click [OK]");
 
-        jButton1.setText("<<Back");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jBHistoryBackButton.setText("<<Back");
+        jBHistoryBackButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jBHistoryBackButtonActionPerformed(evt);
             }
         });
 
@@ -343,16 +301,16 @@ static URL oldURL=null;
         jPGetVerifierNum.setLayout(jPGetVerifierNumLayout);
         jPGetVerifierNumLayout.setHorizontalGroup(
             jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPGetVerifierNumLayout.createSequentialGroup()
-                .addGap(341, 341, 341)
-                .addGroup(jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTFrequestTokenResponse, javax.swing.GroupLayout.Alignment.TRAILING))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPGetVerifierNumLayout.createSequentialGroup()
+                .addContainerGap(542, Short.MAX_VALUE)
+                .addGroup(jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jTFrequestTokenResponse)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(jBGotRequestToken, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(107, 107, 107)
-                .addComponent(jButton1)
-                .addContainerGap(404, Short.MAX_VALUE))
+                .addComponent(jBHistoryBackButton)
+                .addGap(203, 203, 203))
         );
         jPGetVerifierNumLayout.setVerticalGroup(
             jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -363,12 +321,14 @@ static URL oldURL=null;
                 .addGroup(jPGetVerifierNumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTFrequestTokenResponse, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBGotRequestToken, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(jBHistoryBackButton))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
         jPGetVerifierNum.setBounds(0, 0, 1170, 80);
         jLayeredPane1.add(jPGetVerifierNum, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jPTweetStatusUpdate.setBackground(new java.awt.Color(102, 153, 255));
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_tweet.gif"))); // NOI18N
         jButton2.setText("  Tweet!");
@@ -377,7 +337,7 @@ static URL oldURL=null;
         jButton2.setPreferredSize(new java.awt.Dimension(101, 41));
 
         jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Monospaced", 1, 13)); // NOI18N
+        jTextArea1.setFont(new java.awt.Font("Monospaced", 1, 13));
         jTextArea1.setForeground(new java.awt.Color(0, 51, 204));
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(3);
@@ -427,63 +387,6 @@ static URL oldURL=null;
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jToggleBTimeLineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBTimeLineActionPerformed
-            // TODO add your handling code here:
-            jToggleBLists.setSelected(false);
-            jToggleBMentions.setSelected(false);
-            jToggleBMessages.setSelected(false);
-            jToggleBProfiles.setSelected(false);
-            jToggleBSearch.setSelected(false);
-            jEPWeb.setContentType("text/html");
-            jEPWeb.setBackground(Color.white);
-            parseTweet();
-    }//GEN-LAST:event_jToggleBTimeLineActionPerformed
-
-    private void jToggleBMentionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBMentionsActionPerformed
-        // TODO add your handling code here:
-         jToggleBLists.setSelected(false);
-        jToggleBTimeLine.setSelected(false);
-        jToggleBMessages.setSelected(false);
-        jToggleBProfiles.setSelected(false);
-        jToggleBSearch.setSelected(false);
-    }//GEN-LAST:event_jToggleBMentionsActionPerformed
-
-    private void jToggleBMessagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBMessagesActionPerformed
-        // TODO add your handling code here:
-    jToggleBLists.setSelected(false);
-   jToggleBTimeLine.setSelected(false);
-   jToggleBMentions.setSelected(false);
-   jToggleBProfiles.setSelected(false);
-     jToggleBSearch.setSelected(false);
-    }//GEN-LAST:event_jToggleBMessagesActionPerformed
-
-    private void jToggleBListsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBListsActionPerformed
-        // TODO add your handling code here:
-   jToggleBTimeLine.setSelected(false);
-   jToggleBMentions.setSelected(false);
-       jToggleBMessages.setSelected(false);
-        jToggleBProfiles.setSelected(false);
-        jToggleBSearch.setSelected(false);
-    }//GEN-LAST:event_jToggleBListsActionPerformed
-
-    private void jToggleBProfilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBProfilesActionPerformed
-        // TODO add your handling code here:
-    jToggleBTimeLine.setSelected(false);
-       jToggleBMentions.setSelected(false);
-       jToggleBMessages.setSelected(false);
-       jToggleBLists.setSelected(false);
-       jToggleBSearch.setSelected(false);
-    }//GEN-LAST:event_jToggleBProfilesActionPerformed
-
-    private void jToggleBSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleBSearchActionPerformed
-        // TODO add your handling code here:
-       jToggleBTimeLine.setSelected(false);
-       jToggleBMentions.setSelected(false);
-       jToggleBMessages.setSelected(false);
-       jToggleBLists.setSelected(false);
-       jToggleBProfiles.setSelected(false);
-    }//GEN-LAST:event_jToggleBSearchActionPerformed
-
 private void jEPWebHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEPWebHyperlinkUpdate
     HyperlinkEvent.EventType type = evt.getEventType();
     final URL url = evt.getURL();
@@ -509,16 +412,42 @@ private void jEPWebHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-
 }//GEN-LAST:event_jEPWebHyperlinkUpdate
 
 
+private void jBHistoryBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHistoryBackButtonActionPerformed
+
+    //History navigation button for travelling back in surfing time
+    URL url = null;
+    try {
+        url = new URL(oldURL.toString());
+    } catch (MalformedURLException ex) {
+        Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    Document doc = jEPWeb.getDocument();
+    try {
+        jEPWeb.setPage(url);
+    } catch (IOException ioException) {
+        System.out.println("Error following link");
+
+        jEPWeb.setDocument(doc);
+    }
+
+}//GEN-LAST:event_jBHistoryBackButtonActionPerformed
+
+private void jBTimeLineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTimeLineActionPerformed
+//User TimeLine Button and functions to get & show the homeTimeLine
+
+
+}//GEN-LAST:event_jBTimeLineActionPerformed
 
 private void jBGotRequestTokenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGotRequestTokenActionPerformed
-        System.out.println("In OK button clicked after getting number");
-        try {
+// OK Button on get verifier code jPanel
+ try {
             client.oauth_verifier2=jTFrequestTokenResponse.getText();
             client.login_phase_2(requestTokenResponse);
                 jTFrequestTokenResponse.setText("");//clear the text field
                         toggleUIButtons(true);//enable UI Buttons
                         jLayeredPane1.moveToFront(jPTweetStatusUpdate);
-                        initUserInfo();//start populating UI with account info
+                        jPGetVerifierNum.setVisible(false);
+                        initUserData();//start populating UI with account info
 
         } catch (IOException ex) {
             Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -527,100 +456,91 @@ private void jBGotRequestTokenActionPerformed(java.awt.event.ActionEvent evt) {/
         }
 }//GEN-LAST:event_jBGotRequestTokenActionPerformed
 
-private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-//History navigation button for travelling back in surfing time
-    URL url=null;
-        try {
-            url = new URL(oldURL.toString());
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    Document doc =jEPWeb.getDocument();
-      try {
-        jEPWeb.setPage(url);
-      } catch (IOException ioException) {
-        System.out.println("Error following link");
-
-        jEPWeb.setDocument(doc);
-      }
-      System.out.println("Exiting LoadAWebPage method");
-}//GEN-LAST:event_jButton1ActionPerformed
-
      /***
      * @param toggleYN Allows Enable/Disable of UI Components
      * @return void
      */
 private void toggleUIButtons(boolean toggleYN){
-    System.out.println("In toggleButtons method");
+
     boolean toggle=toggleYN;
-//jBPublishTweet.setEnabled(toggle);
-jToggleBLists.setEnabled(toggle);
-jToggleBMentions.setEnabled(toggle);
-jToggleBMessages.setEnabled(toggle);
-jToggleBProfiles.setEnabled(toggle);
-jToggleBSearch.setEnabled(toggle);
-jToggleBTimeLine.setEnabled(toggle);
+    jBTimeLine.setEnabled(toggle);
+    jBMentions.setEnabled(toggle);
+    jBMessages.setEnabled(toggle);
+    jBLists.setEnabled(toggle);
+    jBProfile.setEnabled(toggle);
+    jBSearch.setEnabled(toggle);
 
 }
-private void  parseTweet(){
-          StringBuilder str = new StringBuilder ("<table border='1' width='100%'>");
-         str.append(strGetFriendsTimeline);
+    private void parseTweet() {
+        StringBuilder str = new StringBuilder("<table border='1' width='100%'>");
+        str.append(strGetFriendsTimeline);
         str.append("</table>");
 
- String tokenisedTextString="";
-       StringTokenizer st = new StringTokenizer(str.toString());
+        String tokenisedTextString = "";
+        StringTokenizer st = new StringTokenizer(str.toString());
 
-    while(st.hasMoreTokens())
-    {
-       String key = st.nextToken();
-       if(key.startsWith("#")){
-       key="<a href='https://twitter.com/#!/search?q=%23"+key+"'>"+key+"</a>";
-       }
-       else if(key.startsWith("@")){
-       key="<a href='http://twitter.com/"+key+"'>"+key+"</a>";
-       }
-        else if(key.startsWith("http")){
-       key="<a href='"+key+"'>"+key+"</a>";
-       }
-       else if(key.startsWith("https")){
-       key="<a href='"+key+"'>"+key+"</a>";
+        while (st.hasMoreTokens()) {
+            String key = st.nextToken();
+            if (key.startsWith("#")) {
+                key = "<a href='https://twitter.com/#!/search?q=%23" + key + "'>" + key + "</a>";
+            } else if (key.startsWith("@")) {
+                key = "<a href='http://twitter.com/" + key + "'>" + key + "</a>";
+            } else if (key.startsWith("http")) {
+                key = "<a href='" + key + "'>" + key + "</a>";
+            } else if (key.startsWith("https")) {
+                key = "<a href='" + key + "'>" + key + "</a>";
+            }
+            tokenisedTextString += key + " ";
+            jEPWeb.setText(tokenisedTextString);
         }
-        tokenisedTextString+=key+" ";
-        jEPWeb.setText(tokenisedTextString);
     }
-}
 
+    private void initUserData() throws MalformedURLException, IOException {
 
+        java.awt.EventQueue.invokeLater(new Runnable() {
 
+            @Override
+            public void run() {
+                //Bring st back into scope at method level KD 15/07/11
+                StatusType st = new StatusType();
 
-    private void initUserInfo() throws MalformedURLException, IOException {
-        System.out.println("In InitUserInfo Method");
+                //Log in, get tokens, and append the tokens to the consumer and secret keys
+                client.initOAuth();
+                //Call getUserTimeline, get a list of statuses, pass the most recent
+                //status as a StatusType object, and display the text of that object
+                //in the JTextField
+                Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
+                st = statuses.getStatus().get(0);
+                //try decoding the text before showing it in the ui 22/07/11 - KD
+                jLLatestTweet.setText(st.getText().trim());
 
-        //Bring st back into scope at method level KD 15/07/11
-        StatusType st = new StatusType();
-        //Log in, get tokens, and append the tokens to the consumer and secret keys
-        client.initOAuth();
-        //Call getUserTimeline, get a list of statuses, pass the most recent
-        //status as a StatusType object, and display the text of that object
-        //in the JTextField
-         Statuses statuses = client.getUserTimeline(Statuses.class, null, null, null, "1");
-         st = statuses.getStatus().get(0);
-        //try decoding the text before showing it in the ui 22/07/11 - KD
-        jLLatestTweet.setText(st.getText().trim());
+                //Get a UserType object from the StatusType object, get the URL of that
+                //user's icon, and display that icon in the JLabel
+                UserType user = st.getUser();
+                String iconSrc = user.getProfileImageUrl();
+                URL iconUrl = null;
+                try {
+                    iconUrl = new URL(iconSrc);
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                ImageIcon icon = new ImageIcon(iconUrl, user.getScreenName());
+                jLUserIcon.setIcon(icon);
+                jLTwitterHandle.setText(user.getScreenName());
+            }
+        });
 
-        //Get a UserType object from the StatusType object, get the URL of that
-        //user's icon, and display that icon in the JLabel
-          UserType user = st.getUser();
-          String iconSrc = user.getProfileImageUrl();
-          URL iconUrl = new URL(iconSrc);
-          ImageIcon icon = new ImageIcon(iconUrl, user.getScreenName());
-          jLUserIcon.setIcon(icon);
-          jLTwitterHandle.setText(user.getScreenName());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBGotRequestToken;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jBHistoryBackButton;
+    private javax.swing.JButton jBLists;
+    private javax.swing.JButton jBMentions;
+    private javax.swing.JButton jBMessages;
+    private javax.swing.JButton jBProfile;
+    private javax.swing.JButton jBSearch;
+    private javax.swing.JButton jBTimeLine;
     private javax.swing.JButton jButton2;
     private javax.swing.JEditorPane jEPWeb;
     private javax.swing.JLabel jLLatestTweet;
@@ -641,12 +561,6 @@ private void  parseTweet(){
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jTFrequestTokenResponse;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JToggleButton jToggleBLists;
-    private javax.swing.JToggleButton jToggleBMentions;
-    private javax.swing.JToggleButton jToggleBMessages;
-    private javax.swing.JToggleButton jToggleBProfiles;
-    private javax.swing.JToggleButton jToggleBSearch;
-    private javax.swing.JToggleButton jToggleBTimeLine;
     // End of variables declaration//GEN-END:variables
     /**
      * private TwitterClient client This points to the class below and gives
@@ -661,7 +575,7 @@ private void  parseTweet(){
         private static final String BASE_URI = "https://twitter.com";
 
         public TwitterClient() {
-           System.out.println("In TwitterClient InnerClass Constructor");
+
             com.sun.jersey.api.client.config.ClientConfig config = new com.sun.jersey.api.client.config.DefaultClientConfig(); // SSL configuration
             config.getProperties().put(com.sun.jersey.client.urlconnection.HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new com.sun.jersey.client.urlconnection.HTTPSProperties(getHostnameVerifier(), getSSLContext()));
               client = Client.create(config);
@@ -754,25 +668,19 @@ private void  parseTweet(){
         public void login() throws IOException, UniformInterfaceException {
 
             Form requestTokenResponse = getOAuthRequestToken();
-            System.out.println("In login method phase 1 requestTokenResponse "+requestTokenResponse.toString());
             TwitterJFrame.requestTokenResponse=requestTokenResponse;//pass rTR to outter class so outer class can call loginPhase2
             String temp=getOAuthURL(requestTokenResponse);//playing ball with Jersey just to rob oAuthURL
             }
 
             //seperate these here
             public void login_phase_2(Form requestTokenResponse) throws IOException, UniformInterfaceException {
-            System.out.println("In login_phase_2");
-             String oauth_verifier = authorizeConsumer(requestTokenResponse);
-            System.out.println("oauth_verifier= "+oauth_verifier);
+            String oauth_verifier = authorizeConsumer(requestTokenResponse);
             Form accessTokenResponse = getOAuthAccessToken(requestTokenResponse, oauth_verifier);
-            System.out.println("OAuth Access Token= "+accessTokenResponse.toString());
             oauth_access_token_secret = accessTokenResponse.getFirst("oauth_token_secret");
             oauth_access_token = accessTokenResponse.getFirst("oauth_token");
-             System.out.println("oauth_access_token_secret= "+oauth_access_token_secret+" oauth_access_token= "+oauth_access_token);
-        }
+            }
 
         private Form getOAuthRequestToken() throws UniformInterfaceException {
-            System.out.println("In client.getoAuthRequestToken method");
             WebResource resource = client.resource(OAUTH_BASE_URL).path("request_token");
             oauth_params = new OAuthParameters().consumerKey(CONSUMER_KEY).signatureMethod(com.sun.jersey.oauth.signature.HMAC_SHA1.NAME).version("1.0").nonce().timestamp();
             oauth_secrets = new OAuthSecrets().consumerSecret(CONSUMER_SECRET);
@@ -782,7 +690,6 @@ private void  parseTweet(){
         }
 
         private Form getOAuthAccessToken(Form requestTokenResponse, String oauth_verifier) throws UniformInterfaceException {
-            System.out.println("In client.getoAuthAccessToken method");
             WebResource resource = client.resource(OAUTH_BASE_URL).path("access_token");
             oauth_params.token(requestTokenResponse.getFirst("oauth_token")).signatureMethod(com.sun.jersey.oauth.signature.HMAC_SHA1.NAME).version("1.0").nonce().timestamp().verifier(oauth_verifier);
             oauth_secrets.tokenSecret(requestTokenResponse.getFirst("oauth_token_secret"));
@@ -795,7 +702,6 @@ private void  parseTweet(){
          * The method needs to be called after login() method, or when the webResource path is changed
          */
         public void initOAuth() {
-            System.out.println("In client.initoAuth method");
             oauth_params = new OAuthParameters().consumerKey(CONSUMER_KEY).token(oauth_access_token).signatureMethod(com.sun.jersey.oauth.signature.HMAC_SHA1.NAME).version("1.0").nonce().timestamp();
             oauth_secrets = new OAuthSecrets().consumerSecret(CONSUMER_SECRET).tokenSecret(oauth_access_token_secret);
             oauth_filter = new OAuthClientFilter(client.getProviders(), oauth_params, oauth_secrets);
@@ -815,7 +721,6 @@ private void  parseTweet(){
          * </pre>
          */
         public void makeOAuthRequestUnique() {
-            System.out.println("In client.makeoAuthRequestsUnique method");
             if (oauth_params != null) {
 
                 oauth_params.nonce().timestamp();
@@ -833,20 +738,17 @@ private void  parseTweet(){
             } catch (java.net.URISyntaxException ex) {
             }
             TwitterJFrame.oAuthURL=url;//transfer oAuthURL from inner class to outter class
-            System.out.println("In client.getOAuthURL url="+strURLstr);
-       return strURLstr;
+            return strURLstr;
        }
 
         private java.lang.String authorizeConsumer(Form requestTokenResponse) throws IOException {
             String ov2=null;
             ov2=oauth_verifier2;
-            System.out.println("In client.authoriseConnsumer method, oAuth VerifierNumber is: "+ov2);
             return ov2;
     }
 
         private HostnameVerifier getHostnameVerifier() {
-            System.out.println("In client.getHostnameVerifier method");
-            return new HostnameVerifier() {
+           return new HostnameVerifier() {
 
                 @Override
                 public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
@@ -856,8 +758,7 @@ private void  parseTweet(){
         }
 
         private SSLContext getSSLContext() {
-            System.out.println("In client.getSSLContext method");
-            javax.net.ssl.TrustManager x509 = new javax.net.ssl.X509TrustManager() {
+          javax.net.ssl.TrustManager x509 = new javax.net.ssl.X509TrustManager() {
 
                 @Override
                 public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
