@@ -473,7 +473,7 @@ private void toggleUIButtons(boolean toggleYN){
 }
     private void parseTweet() {
         StringBuilder str = new StringBuilder("<table border='1' width='100%'>");
-        str.append(strGetFriendsTimeline);
+       // str.append(strGetFriendsTimeline);
         str.append("</table>");
 
         String tokenisedTextString = "";
