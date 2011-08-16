@@ -38,7 +38,8 @@ public class TwitterJFrame extends javax.swing.JFrame {
     static URL oAuthURL = null;//comes from inner class AthoriseConsumer method
     static URL oldURL = null;//prevoius oAuth page on twitter
     static Form requestTokenResponse = null;//Form object from twitter
-
+    String homeTimeLineTweets="";//fill with formatted tweets
+    String tweetsForParsing="";//append timeslines to this
     public TwitterJFrame() {
         /** TwitterJFrame class constructor */
         initComponents(); //Step (1)
@@ -215,11 +216,11 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jLTwitterHandle.setForeground(new java.awt.Color(0, 0, 255));
         jLTwitterHandle.setText("Twitter Handle");
 
-        jLStatusLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLStatusLabel.setFont(new java.awt.Font("Tahoma", 1, 14));
         jLStatusLabel.setForeground(new java.awt.Color(0, 0, 255));
         jLStatusLabel.setText("Status:");
 
-        jLLatestTweet.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLLatestTweet.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLLatestTweet.setForeground(new java.awt.Color(0, 0, 255));
         jLLatestTweet.setText("status");
 
@@ -291,7 +292,7 @@ public class TwitterJFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabel5.setText("Enter 8 digit number, then click [OK]");
+        jLabel5.setText("Enter 7 digit number, then click [OK]");
 
         jBHistoryBackButton.setText("<<Back");
         jBHistoryBackButton.addActionListener(new java.awt.event.ActionListener() {
@@ -332,9 +333,16 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jLayeredPane1.add(jPGetVerifierNum, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jPTweetStatusUpdate.setBackground(new java.awt.Color(102, 153, 255));
+        jPTweetStatusUpdate.setFocusable(false);
+        jPTweetStatusUpdate.setOpaque(false);
+        jPTweetStatusUpdate.setRequestFocusEnabled(false);
+        jPTweetStatusUpdate.setVerifyInputWhenFocusTarget(false);
 
         jBTweetATweet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_tweet.gif"))); // NOI18N
         jBTweetATweet.setText("  Tweet!");
+        jBTweetATweet.setEnabled(false);
+        jBTweetATweet.setFocusPainted(false);
+        jBTweetATweet.setFocusable(false);
         jBTweetATweet.setMaximumSize(new java.awt.Dimension(104, 41));
         jBTweetATweet.setMinimumSize(new java.awt.Dimension(104, 41));
         jBTweetATweet.setPreferredSize(new java.awt.Dimension(101, 41));
@@ -344,12 +352,18 @@ public class TwitterJFrame extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane2.setEnabled(false);
+        jScrollPane2.setFocusable(false);
+        jScrollPane2.setOpaque(false);
+        jScrollPane2.setRequestFocusEnabled(false);
+
         jTANewTweet.setColumns(20);
         jTANewTweet.setFont(new java.awt.Font("Monospaced", 1, 13)); // NOI18N
         jTANewTweet.setForeground(new java.awt.Color(0, 51, 204));
         jTANewTweet.setLineWrap(true);
         jTANewTweet.setRows(3);
         jTANewTweet.setToolTipText("120 Maximum characters");
+        jTANewTweet.setEnabled(false);
         jScrollPane2.setViewportView(jTANewTweet);
 
         javax.swing.GroupLayout jPTweetStatusUpdateLayout = new javax.swing.GroupLayout(jPTweetStatusUpdate);
@@ -404,6 +418,8 @@ private void jEPWebHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-
 
             @Override
             public void run() {
+                  //Log in, get tokens, and append the tokens to the consumer and secret keys
+                client.initOAuth();
                 // Retain reference to original
                 Document doc = jEPWeb.getDocument();
                 try {
@@ -441,7 +457,22 @@ private void jBHistoryBackButtonActionPerformed(java.awt.event.ActionEvent evt) 
 }//GEN-LAST:event_jBHistoryBackButtonActionPerformed
 
 private void jBTimeLineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTimeLineActionPerformed
-//User TimeLine Button and functions to get & show the homeTimeLine
+//Home/User TimeLine Button and functions to get & show the homeTimeLine
+    client.initOAuth();
+
+   // java.awt.EventQueue.invokeLater(new Runnable() {
+
+      //  @Override
+    //    public void run() {
+            homeTimeLineTweets="";
+            Statuses userStatuses = client.getFriendsTimeline(Statuses.class, null, null, null, "20");//collection of tweets
+            for (StatusType userStatusType : userStatuses.getStatus()) {
+ homeTimeLineTweets +="<tr><td><img src="+"\""+userStatusType.getUser().getProfileImageUrl()+"\""+"></td></tr>";
+            }
+           tweetsForParsing=homeTimeLineTweets;
+           parseTweet();//send string of tweets off for parsing
+      //  }
+   // });
 
 
 }//GEN-LAST:event_jBTimeLineActionPerformed
@@ -454,7 +485,22 @@ private void jBGotRequestTokenActionPerformed(java.awt.event.ActionEvent evt) {/
         jTFrequestTokenResponse.setText("");//clear the text field
         toggleUIButtons(true);//enable UI Buttons
         jLayeredPane1.moveToFront(jPTweetStatusUpdate);
+        jPTweetStatusUpdate.setOpaque(true);
+        jPTweetStatusUpdate.setFocusable(true);
+        jPTweetStatusUpdate.setEnabled(true);
+        jPTweetStatusUpdate.setRequestFocusEnabled(true);
+        jPTweetStatusUpdate.setVerifyInputWhenFocusTarget(true);
+        jPTweetStatusUpdate.setVisible(true);
         jPGetVerifierNum.setVisible(false);
+        jBHistoryBackButton.setFocusable(false);
+        jBHistoryBackButton.setFocusPainted(false);
+        jBTweetATweet.setEnabled(true);
+        jBTweetATweet.setFocusable(true);
+        jBTweetATweet.setFocusPainted(true);
+        jScrollPane2.setRequestFocusEnabled(true);
+        jScrollPane2.setOpaque(true);
+        jScrollPane2.setEnabled(true);
+        jTANewTweet.setEnabled(true);
         initUserData();//start populating UI with account info
 
     } catch (IOException ex) {
@@ -496,8 +542,14 @@ private void toggleUIButtons(boolean toggleYN){
 
 }
     private void parseTweet() {
-        StringBuilder str = new StringBuilder("<table border='1' width='100%'>");
-       // str.append(strGetFriendsTimeline);
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+
+        @Override
+        public void run() {
+
+        StringBuilder str = new StringBuilder("<table border='1' width='935'>");
+        str.append(tweetsForParsing);
         str.append("</table>");
 
         String tokenisedTextString = "";
@@ -517,6 +569,9 @@ private void toggleUIButtons(boolean toggleYN){
             tokenisedTextString += key + " ";
             jEPWeb.setText(tokenisedTextString);
         }
+         }
+    }
+);
     }
 
     private void initUserData() throws MalformedURLException, IOException {
