@@ -470,7 +470,8 @@ private void jBTimeLineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         @Override
         public void run() {
               client.initOAuth();
-            vectorTableRows.add("<table border='0' width='938'>");
+              vectorTableRows.clear();
+            vectorTableRows.add("<table border='0' width='932'>");
            String  homeTimeLineTweets="";
             Statuses userStatuses = client.getFriendsTimeline(Statuses.class, null, null, null, "20");//collection of tweets
             for (StatusType userStatusType : userStatuses.getStatus()) {
