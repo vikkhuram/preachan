@@ -8,15 +8,18 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ListIterator;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -38,8 +41,9 @@ public class TwitterJFrame extends javax.swing.JFrame {
     static URL oAuthURL = null;//comes from inner class AthoriseConsumer method
     static URL oldURL = null;//prevoius oAuth page on twitter
     static Form requestTokenResponse = null;//Form object from twitter
-    String homeTimeLineTweets="";//fill with formatted tweets
-    String tweetsForParsing="";//append timeslines to this
+     StringBuilder str = new StringBuilder(9000);
+   Vector<String> vectorTableRows=new Vector<String>(20);
+
     public TwitterJFrame() {
         /** TwitterJFrame class constructor */
         initComponents(); //Step (1)
@@ -207,21 +211,21 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jPPhotoHandle.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
 
         jLUserIcon.setText("photo");
-        jLUserIcon.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 255)));
+        jLUserIcon.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         jLUserIcon.setMaximumSize(new java.awt.Dimension(48, 48));
         jLUserIcon.setMinimumSize(new java.awt.Dimension(48, 48));
         jLUserIcon.setPreferredSize(new java.awt.Dimension(48, 48));
 
-        jLTwitterHandle.setFont(new java.awt.Font("Tahoma", 1, 14));
-        jLTwitterHandle.setForeground(new java.awt.Color(0, 0, 255));
+        jLTwitterHandle.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLTwitterHandle.setForeground(new java.awt.Color(255, 255, 255));
         jLTwitterHandle.setText("Twitter Handle");
 
         jLStatusLabel.setFont(new java.awt.Font("Tahoma", 1, 14));
         jLStatusLabel.setForeground(new java.awt.Color(0, 0, 255));
         jLStatusLabel.setText("Status:");
 
-        jLLatestTweet.setFont(new java.awt.Font("Tahoma", 1, 12));
-        jLLatestTweet.setForeground(new java.awt.Color(0, 0, 255));
+        jLLatestTweet.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLLatestTweet.setForeground(new java.awt.Color(255, 255, 255));
         jLLatestTweet.setText("status");
 
         javax.swing.GroupLayout jPPhotoHandleLayout = new javax.swing.GroupLayout(jPPhotoHandle);
@@ -261,10 +265,10 @@ public class TwitterJFrame extends javax.swing.JFrame {
 
         jScrollPane1.setBorder(null);
 
-        jEPWeb.setBackground(new java.awt.Color(204, 204, 255));
         jEPWeb.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
         jEPWeb.setContentType("text/html");
         jEPWeb.setEditable(false);
+        jEPWeb.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body bgcolor=\"white\">\r\n    <p style=\"margin-top: 0\">\r\n      \r\n    </p>\r\n  </body>\r\n</html>\r\n");
         jEPWeb.setDoubleBuffered(true);
         jEPWeb.setDragEnabled(true);
         jEPWeb.setFocusTraversalPolicyProvider(true);
@@ -356,9 +360,10 @@ public class TwitterJFrame extends javax.swing.JFrame {
         jScrollPane2.setFocusable(false);
         jScrollPane2.setOpaque(false);
         jScrollPane2.setRequestFocusEnabled(false);
+        jScrollPane2.setWheelScrollingEnabled(false);
 
         jTANewTweet.setColumns(20);
-        jTANewTweet.setFont(new java.awt.Font("Monospaced", 1, 13)); // NOI18N
+        jTANewTweet.setFont(new java.awt.Font("Monospaced", 1, 13));
         jTANewTweet.setForeground(new java.awt.Color(0, 51, 204));
         jTANewTweet.setLineWrap(true);
         jTANewTweet.setRows(3);
@@ -458,21 +463,24 @@ private void jBHistoryBackButtonActionPerformed(java.awt.event.ActionEvent evt) 
 
 private void jBTimeLineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTimeLineActionPerformed
 //Home/User TimeLine Button and functions to get & show the homeTimeLine
-    client.initOAuth();
 
-   // java.awt.EventQueue.invokeLater(new Runnable() {
 
-      //  @Override
-    //    public void run() {
-            homeTimeLineTweets="";
+    java.awt.EventQueue.invokeLater(new Runnable() {
+
+        @Override
+        public void run() {
+              client.initOAuth();
+            vectorTableRows.add("<table border='0' width='938'>");
+           String  homeTimeLineTweets="";
             Statuses userStatuses = client.getFriendsTimeline(Statuses.class, null, null, null, "20");//collection of tweets
             for (StatusType userStatusType : userStatuses.getStatus()) {
- homeTimeLineTweets +="<tr><td><img src="+"\""+userStatusType.getUser().getProfileImageUrl()+"\""+"></td></tr>";
+            homeTimeLineTweets ="<tr bgcolor='#ffffff'><td width='49' bgcolor='#ffffff'><img src='"+userStatusType.getUser().getProfileImageUrl()+"' height='48' width='48'></td><td bgcolor='#ffffff'><font face='Arial' size='4'><b>"+userStatusType.getUser().getScreenName().toUpperCase()+"</b><br>"+userStatusType.getText()+"</font><hr></td></tr>";
+            vectorTableRows.add(homeTimeLineTweets);
             }
-           tweetsForParsing=homeTimeLineTweets;
-           parseTweet();//send string of tweets off for parsing
-      //  }
-   // });
+            vectorTableRows.add("<table>");
+          parseTweet();//send string of tweets off for parsing
+        }
+    });
 
 
 }//GEN-LAST:event_jBTimeLineActionPerformed
@@ -483,7 +491,7 @@ private void jBGotRequestTokenActionPerformed(java.awt.event.ActionEvent evt) {/
         client.oauth_verifier2 = jTFrequestTokenResponse.getText();
         client.login_phase_2(requestTokenResponse);
         jTFrequestTokenResponse.setText("");//clear the text field
-        toggleUIButtons(true);//enable UI Buttons
+
         jLayeredPane1.moveToFront(jPTweetStatusUpdate);
         jPTweetStatusUpdate.setOpaque(true);
         jPTweetStatusUpdate.setFocusable(true);
@@ -500,8 +508,11 @@ private void jBGotRequestTokenActionPerformed(java.awt.event.ActionEvent evt) {/
         jScrollPane2.setRequestFocusEnabled(true);
         jScrollPane2.setOpaque(true);
         jScrollPane2.setEnabled(true);
+        jScrollPane2.setWheelScrollingEnabled(true);
         jTANewTweet.setEnabled(true);
         initUserData();//start populating UI with account info
+        jEPWeb.setBackground(Color.white);
+        toggleUIButtons(true);//enable UI Buttons
 
     } catch (IOException ex) {
         Logger.getLogger(TwitterJFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -515,15 +526,19 @@ private void jBTweetATweetActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     String rawStatus = jTANewTweet.getText().trim();
 
     client.makeOAuthRequestUnique();
-    try {
-        String status = java.net.URLEncoder.encode(rawStatus, "UTF-8");
+   // try {
+        //String status = java.net.URLEncoder.encode(rawStatus, "UTF-8");
+        String status = rawStatus;
         client.updateStatus(String.class, status, null);
-    } catch (UniformInterfaceException ex) {
-        JOptionPane.showMessageDialog(null, "Error following link",
-                "Exception when calling updateStatus = " + ex.getResponse().getEntity(String.class), JOptionPane.ERROR_MESSAGE);
-    } catch (UnsupportedEncodingException uee) {
-    }
+   // }// catch (UniformInterfaceException ex) {
+     //   JOptionPane.showMessageDialog(null, "Error following link",
+    //            "Exception when calling updateStatus = " + ex.getResponse().getEntity(String.class), JOptionPane.ERROR_MESSAGE);
+   // } catch (UnsupportedEncodingException uee) {
+    //}
     jTANewTweet.setText(" ");
+
+   // jEPWeb.setText("<table width='100%' border='0'><tr><td><h3>Click the buttons on the left to see your latest tweets</h3></td></tr></table>");
+
 }//GEN-LAST:event_jBTweetATweetActionPerformed
 
      /***
@@ -542,20 +557,17 @@ private void toggleUIButtons(boolean toggleYN){
 
 }
     private void parseTweet() {
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-        @Override
-        public void run() {
-
-        StringBuilder str = new StringBuilder("<table border='1' width='935'>");
-        str.append(tweetsForParsing);
-        str.append("</table>");
-
+       // Boolean hasNext=null;
+   // str.append("<table border='0' width='930' bgcolor='#ffffff'");
+        ListIterator iter = vectorTableRows.listIterator();
         String tokenisedTextString = "";
-        StringTokenizer st = new StringTokenizer(str.toString());
 
-        while (st.hasMoreTokens()) {
+
+        while (iter.hasNext()) {
+         //   hasNext=str.append(iter.hasNext());
+            //StringBuilder append = str.append(iter.hasNext());
+            StringTokenizer st = new StringTokenizer(iter.next().toString());
+              while (st.hasMoreTokens()) {
             String key = st.nextToken();
             if (key.startsWith("#")) {
                 key = "<a href='https://twitter.com/#!/search?q=%23" + key + "'>" + key + "</a>";
@@ -567,11 +579,20 @@ private void toggleUIButtons(boolean toggleYN){
                 key = "<a href='" + key + "'>" + key + "</a>";
             }
             tokenisedTextString += key + " ";
-            jEPWeb.setText(tokenisedTextString);
         }
-         }
-    }
-);
+            jEPWeb.setText("");
+            jEPWeb.setText(tokenisedTextString);
+
+
+      }
+
+        //str.append("</table>");
+     //   String tokenisedTextString = st"";
+      //  StringTokenizer st = new StringTokenizer(str.toString());
+
+
+
+
     }
 
     private void initUserData() throws MalformedURLException, IOException {
