@@ -132,6 +132,8 @@ private void collectLoginData() {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTANewTweet = new javax.swing.JTextArea();
         jLPMainDisplay = new javax.swing.JLayeredPane();
+        jSPWebPane = new javax.swing.JScrollPane();
+        jEPWeb = new javax.swing.JEditorPane();
         jPMyProfile = new javax.swing.JPanel();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
@@ -163,8 +165,25 @@ private void collectLoginData() {
         jLabel15 = new javax.swing.JLabel();
         jLFollowing = new javax.swing.JLabel();
         jLFollowers = new javax.swing.JLabel();
-        jSPWebPane = new javax.swing.JScrollPane();
-        jEPWeb = new javax.swing.JEditorPane();
+        jPSearchPanel = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jTextField1 = new javax.swing.JTextField();
+        jButton5 = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
+        jLabel3 = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        jPanel10 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jList2 = new javax.swing.JList();
+        jLabel4 = new javax.swing.JLabel();
+        jSeparator4 = new javax.swing.JSeparator();
+        jPanel11 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jSeparator5 = new javax.swing.JSeparator();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jList3 = new javax.swing.JList();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("___ Project Preachan___");
@@ -181,6 +200,11 @@ private void collectLoginData() {
 
         jBMentions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_mentions.gif"))); // NOI18N
         jBMentions.setText("Mentions");
+        jBMentions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBMentionsActionPerformed(evt);
+            }
+        });
         jPanel1.add(jBMentions, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 170, -1));
 
         jBMessages.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_messages.gif"))); // NOI18N
@@ -202,6 +226,11 @@ private void collectLoginData() {
 
         jBSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_search.gif"))); // NOI18N
         jBSearch.setText("Search");
+        jBSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSearchActionPerformed(evt);
+            }
+        });
         jPanel1.add(jBSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 260, 170, -1));
 
         jBTimeLine.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_time_line.gif"))); // NOI18N
@@ -404,6 +433,25 @@ private void collectLoginData() {
 
         jPBaseLayer.add(jLPLoginTweet, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 592, 1170, 80));
 
+        jSPWebPane.setBorder(null);
+
+        jEPWeb.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        jEPWeb.setContentType("text/html");
+        jEPWeb.setEditable(false);
+        jEPWeb.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body bgcolor=\"white\">\r\n    <p style=\"margin-top: 0\">\r\n      \r\n    </p>\r\n  </body>\r\n</html>\r\n");
+        jEPWeb.setDoubleBuffered(true);
+        jEPWeb.setDragEnabled(true);
+        jEPWeb.setFocusTraversalPolicyProvider(true);
+        jEPWeb.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
+                jEPWebHyperlinkUpdate(evt);
+            }
+        });
+        jSPWebPane.setViewportView(jEPWeb);
+
+        jSPWebPane.setBounds(0, 0, 940, 470);
+        jLPMainDisplay.add(jSPWebPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
         jPMyProfile.setBackground(new java.awt.Color(255, 255, 255));
         jPMyProfile.setEnabled(false);
         jPMyProfile.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -419,27 +467,27 @@ private void collectLoginData() {
         jPanel2.setPreferredSize(new java.awt.Dimension(276, 127));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel20.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel20.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel20.setText("#");
         jPanel2.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(78, 79, -1, -1));
 
-        jLabel19.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel19.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel19.setText("@");
         jPanel2.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(78, 41, -1, -1));
 
-        jLabel18.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel18.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel18.setText("Name");
         jPanel2.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(78, 13, -1, -1));
 
-        jLRealName.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLRealName.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLRealName.setText("Name");
         jPanel2.add(jLRealName, new org.netbeans.lib.awtextra.AbsoluteConstraints(134, 13, -1, -1));
 
-        jLATTweeter.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLATTweeter.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLATTweeter.setText("@");
         jPanel2.add(jLATTweeter, new org.netbeans.lib.awtextra.AbsoluteConstraints(131, 41, -1, -1));
 
-        jLHashTwitter.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLHashTwitter.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLHashTwitter.setText("#");
         jPanel2.add(jLHashTwitter, new org.netbeans.lib.awtextra.AbsoluteConstraints(131, 79, -1, -1));
 
@@ -484,27 +532,27 @@ private void collectLoginData() {
         jPanel5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLTweeterBio.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLTweeterBio.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLTweeterBio.setText("bio");
         jPanel5.add(jLTweeterBio, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 10, -1, -1));
 
-        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel8.setText("Bio");
         jPanel5.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, -1, -1));
 
-        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel9.setText("Location");
         jPanel5.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, -1, -1));
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel10.setText("Web");
         jPanel5.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, -1, -1));
 
-        jLTwitterWeb.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLTwitterWeb.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLTwitterWeb.setText("web");
         jPanel5.add(jLTwitterWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 70, -1, -1));
 
-        jLTwitterLocation.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLTwitterLocation.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLTwitterLocation.setText("location");
         jPanel5.add(jLTwitterLocation, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 40, -1, -1));
 
@@ -529,19 +577,19 @@ private void collectLoginData() {
         jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
         jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel14.setText("Following");
         jPanel7.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, -1, -1));
 
-        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel15.setText("Followers");
         jPanel7.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 10, -1, -1));
 
-        jLFollowing.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLFollowing.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLFollowing.setText("--");
         jPanel7.add(jLFollowing, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
 
-        jLFollowers.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLFollowers.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLFollowers.setText("--");
         jPanel7.add(jLFollowers, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 30, -1, -1));
 
@@ -550,24 +598,141 @@ private void collectLoginData() {
         jPMyProfile.setBounds(0, 0, 940, 470);
         jLPMainDisplay.add(jPMyProfile, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        jSPWebPane.setBorder(null);
+        jPSearchPanel.setBackground(new java.awt.Color(255, 255, 255));
+        jPSearchPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jEPWeb.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
-        jEPWeb.setContentType("text/html");
-        jEPWeb.setEditable(false);
-        jEPWeb.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body bgcolor=\"white\">\r\n    <p style=\"margin-top: 0\">\r\n      \r\n    </p>\r\n  </body>\r\n</html>\r\n");
-        jEPWeb.setDoubleBuffered(true);
-        jEPWeb.setDragEnabled(true);
-        jEPWeb.setFocusTraversalPolicyProvider(true);
-        jEPWeb.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
-            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
-                jEPWebHyperlinkUpdate(evt);
-            }
+        jPanel8.setBackground(new java.awt.Color(102, 153, 255));
+        jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
+
+        jTextField1.setText("search");
+
+        jButton5.setText("OK");
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton5)
+                .addContainerGap(723, Short.MAX_VALUE))
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5))
+                .addContainerGap(14, Short.MAX_VALUE))
+        );
+
+        jPSearchPanel.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 920, 50));
+
+        jPanel9.setBackground(new java.awt.Color(102, 153, 255));
+        jPanel9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
+
+        jList1.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
         });
-        jSPWebPane.setViewportView(jEPWeb);
+        jScrollPane1.setViewportView(jList1);
 
-        jSPWebPane.setBounds(0, 0, 940, 470);
-        jLPMainDisplay.add(jSPWebPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jLabel3.setText("Saved Searches");
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jSeparator3, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3)
+                .addContainerGap(180, Short.MAX_VALUE))
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addGap(8, 8, 8)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(206, Short.MAX_VALUE))
+        );
+
+        jPSearchPanel.add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 300, 390));
+
+        jPanel10.setBackground(new java.awt.Color(102, 153, 255));
+        jPanel10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
+
+        jList2.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane3.setViewportView(jList2);
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel4.setText("Trending Now");
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE))
+                .addContainerGap())
+            .addComponent(jSeparator4, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addGap(7, 7, 7)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(11, 11, 11)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(207, Short.MAX_VALUE))
+        );
+
+        jPSearchPanel.add(jPanel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 70, 300, 390));
+
+        jPanel11.setBackground(new java.awt.Color(102, 153, 255));
+        jPanel11.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
+        jPanel11.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel6.setText("Top Tweets");
+        jPanel11.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
+        jPanel11.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 298, 10));
+
+        jList3.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane4.setViewportView(jList3);
+
+        jPanel11.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 270, -1));
+
+        jPSearchPanel.add(jPanel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 70, 300, 390));
+
+        jPSearchPanel.setBounds(0, 0, 940, 470);
+        jLPMainDisplay.add(jPSearchPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jPBaseLayer.add(jLPMainDisplay, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 100, 940, 470));
 
@@ -738,6 +903,32 @@ private void jBProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 
 }//GEN-LAST:event_jBProfileActionPerformed
 
+private void jBMentionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMentionsActionPerformed
+// Mentions Button lists where @kevindoyletweet is used in a mentions Timeline
+        java.awt.EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+            jLPMainDisplay.moveToFront(jSPWebPane);
+        client.initOAuth();
+        vectorTableRows.clear();
+        vectorTableRows.add("<table border='0' width='932'>");
+        String homeTimeLineTweets = "";
+                Statuses userMentions = client.getMentions(Statuses.class, null, null, null, "20");//collection of tweets
+        for (StatusType userStatusType : userMentions.getStatus()) {
+         homeTimeLineTweets = "<tr bgcolor='#ffffff'><td width='49' bgcolor='#ffffff'><img src='" + userStatusType.getUser().getProfileImageUrl() + "' height='48' width='48'></td><td bgcolor='#ffffff'><font face='Arial' size='4'><b>" + userStatusType.getUser().getScreenName().toUpperCase() + "</b><br>" + userStatusType.getText() + "</font><hr></td></tr>";
+         vectorTableRows.add(homeTimeLineTweets);
+        }
+        vectorTableRows.add("<table>");
+        parseTweet();//send string of tweets off for parsing
+    }
+});
+}//GEN-LAST:event_jBMentionsActionPerformed
+
+private void jBSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSearchActionPerformed
+// TODO add your handling code here:
+    jLPMainDisplay.moveToFront(jPSearchPanel);
+}//GEN-LAST:event_jBSearchActionPerformed
+
      /***
      * @param toggleYN Allows Enable/Disable of UI Components
      * @return void
@@ -820,6 +1011,7 @@ private void toggleUIButtons(boolean toggleYN){
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JEditorPane jEPWeb;
     private javax.swing.JLabel jLATTweeter;
     private javax.swing.JLabel jLFollowers;
@@ -846,27 +1038,45 @@ private void toggleUIButtons(boolean toggleYN){
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JList jList1;
+    private javax.swing.JList jList2;
+    private javax.swing.JList jList3;
     private javax.swing.JPanel jPBaseLayer;
     private javax.swing.JPanel jPGetVerifierNum;
     private javax.swing.JPanel jPMyProfile;
     private javax.swing.JPanel jPPhotoHandle;
+    private javax.swing.JPanel jPSearchPanel;
     private javax.swing.JPanel jPTweetStatusUpdate;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jSPWebPane;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
     private javax.swing.JTextArea jTANewTweet;
     private javax.swing.JTextField jTFrequestTokenResponse;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
     /**
      * private TwitterClient client This points to the class below and gives
@@ -919,12 +1129,20 @@ private void toggleUIButtons(boolean toggleYN){
          * @param count query parameter
          * @return response object (instance of responseType class)
          */
-        //This function returns my tweets
+         //This function returns my tweets
         public <T> T getUserTimeline(Class<T> responseType, String since, String since_id, String page, String count) throws UniformInterfaceException {
             String[] queryParamNames = new String[]{"since", "since_id", "page", "count"};
             String[] queryParamValues = new String[]{since, since_id, page, "count"};
             return webResource.path("/statuses/user_timeline.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
         }
+
+        //this function returns tweets that mention me
+        public <T> T getMentions(Class<T> responseType, String since, String since_id, String page, String count) throws UniformInterfaceException {
+            String[] queryParamNames = new String[]{"since", "since_id", "page", "count"};
+            String[] queryParamValues = new String[]{since, since_id, page, "count"};
+            return webResource.path("/statuses/mentions.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
+        }
+
 
             //this function returns the tweets of people I follow
             public <T> T getFriendsTimeline(Class<T> responseType, String since, String since_id, String page, String count) throws UniformInterfaceException {
