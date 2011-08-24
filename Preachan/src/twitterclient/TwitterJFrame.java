@@ -800,6 +800,9 @@ private void jBTimeLineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         @Override
         public void run() {
             jLPMainDisplay.moveToBack(jSPWebPane);
+             jPMyProfile.setVisible(false);
+            jPSearchPanel.setVisible(false);
+        jSPWebPane.setVisible(true);
         client.initOAuth();
         vectorTableRows.clear();
         vectorTableRows.add("<table border='0' width='932'>");
@@ -864,8 +867,12 @@ private void jBProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     jLPMainDisplay.moveToFront(jPMyProfile);
     jPMyProfile.setEnabled(true);
     jSPWebPane.setEnabled(false);
-     jPMyProfile.setOpaque(true);
-     jSPWebPane.setOpaque(false);
+   //  jPMyProfile.setOpaque(true);
+   // jSPWebPane.setOpaque(false);
+       jPMyProfile.setVisible(true);
+            jPSearchPanel.setVisible(false);
+            //jSPWebPane.setWheelScrollingEnabled(false);
+            jSPWebPane.setVisible(false);
      java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -909,6 +916,9 @@ private void jBMentionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         @Override
         public void run() {
             jLPMainDisplay.moveToFront(jSPWebPane);
+            jPMyProfile.setVisible(false);
+            jPSearchPanel.setVisible(false);
+            jSPWebPane.setVisible(true);
         client.initOAuth();
         vectorTableRows.clear();
         vectorTableRows.add("<table border='0' width='932'>");
@@ -926,7 +936,10 @@ private void jBMentionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 private void jBSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSearchActionPerformed
 // TODO add your handling code here:
+      jPMyProfile.setVisible(false);
+            jPSearchPanel.setVisible(true);
     jLPMainDisplay.moveToFront(jPSearchPanel);
+
 }//GEN-LAST:event_jBSearchActionPerformed
 
      /***
