@@ -27,6 +27,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import twitter.twitteroauth.twitterresponse.StatusType;
 import twitter.twitteroauth.twitterresponse.Statuses;
 import twitter.twitteroauth.twitterresponse.UserType;
+import twitter.twitteroauth.twitterresponse.DirectMessageType;
+import twitter.twitteroauth.twitterresponse.DirectMessages;
 
 /**
  * @author Kevin Doyle
@@ -960,11 +962,13 @@ private void jBSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         vectorTableRows.clear();
         vectorTableRows.add("<table border='0' width='932'>");
         String homeTimeLineTweets = "";
-                Statuses userMentions = client.getMentions(Statuses.class, null, null, null, "20");//collection of tweets
-        for (StatusType userStatusType : userMentions.getStatus()) {
-         homeTimeLineTweets = "<tr bgcolor='#ffffff'><td width='49' bgcolor='#ffffff'><img src='" + userStatusType.getUser().getProfileImageUrl() + "' height='48' width='48'></td><td bgcolor='#ffffff'><font face='Arial' size='4'><b>" + userStatusType.getUser().getScreenName().toUpperCase() + "</b><br>" + userStatusType.getText() + "</font><hr></td></tr>";
-         vectorTableRows.add(homeTimeLineTweets);
+       DirectMessages userDirectMessage = client.getDirectMessagesToMe(DirectMessages.class, null, null,null);//collection of tweets
+      
+       for(DirectMessageType userDirectMessageType: userDirectMessage.getDirectMessage()){
+        homeTimeLineTweets = "<tr bgcolor='#ffffff'><td width='49' bgcolor='#ffffff'><img src='" + userDirectMessageType.getSender().getProfileImageUrl() + "' height='48' width='48'></td><td bgcolor='#ffffff'><font face='Arial' size='4'><b>" + userDirectMessageType.getSender().getScreenName().toUpperCase() + "</b><br>" + userDirectMessageType.getText() + "</font><hr></td></tr>";
+        vectorTableRows.add(homeTimeLineTweets);
         }
+        
         vectorTableRows.add("<table>");
         parseTweet();//send string of tweets off for parsing
     }
@@ -1188,7 +1192,7 @@ private void toggleUIButtons(boolean toggleYN){
          public <T> T getDirectMessagesToMe(Class<T> responseType, String since, String since_id, String page) throws UniformInterfaceException {
             String[] queryParamNames = new String[]{"since", "since_id", "page"};
             String[] queryParamValues = new String[]{since, since_id, page};
-            return webResource.path("/statuses/direct_messages.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
+            return webResource.path("/direct_messages.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
         }
 
             //this function returns the tweets of people I follow
