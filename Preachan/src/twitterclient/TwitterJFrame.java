@@ -209,6 +209,11 @@ private void collectLoginData() {
 
         jBMessages.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_messages.gif"))); // NOI18N
         jBMessages.setText("Messages");
+        jBMessages.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBMessagesActionPerformed(evt);
+            }
+        });
         jPanel1.add(jBMessages, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 170, -1));
 
         jBLists.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_lists.gif"))); // NOI18N
@@ -682,7 +687,7 @@ private void collectLoginData() {
         });
         jScrollPane3.setViewportView(jList2);
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14));
         jLabel4.setText("Trending Now");
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
@@ -715,7 +720,7 @@ private void collectLoginData() {
         jPanel11.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
         jPanel11.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 14));
         jLabel6.setText("Top Tweets");
         jPanel11.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
         jPanel11.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 298, 10));
@@ -942,6 +947,30 @@ private void jBSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
 }//GEN-LAST:event_jBSearchActionPerformed
 
+    private void jBMessagesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMessagesActionPerformed
+    // Messages Button lists private messages to @kevindoyletweet 
+        java.awt.EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+            jLPMainDisplay.moveToFront(jSPWebPane);
+            jPMyProfile.setVisible(false);
+            jPSearchPanel.setVisible(false);
+            jSPWebPane.setVisible(true);
+        client.initOAuth();
+        vectorTableRows.clear();
+        vectorTableRows.add("<table border='0' width='932'>");
+        String homeTimeLineTweets = "";
+                Statuses userMentions = client.getMentions(Statuses.class, null, null, null, "20");//collection of tweets
+        for (StatusType userStatusType : userMentions.getStatus()) {
+         homeTimeLineTweets = "<tr bgcolor='#ffffff'><td width='49' bgcolor='#ffffff'><img src='" + userStatusType.getUser().getProfileImageUrl() + "' height='48' width='48'></td><td bgcolor='#ffffff'><font face='Arial' size='4'><b>" + userStatusType.getUser().getScreenName().toUpperCase() + "</b><br>" + userStatusType.getText() + "</font><hr></td></tr>";
+         vectorTableRows.add(homeTimeLineTweets);
+        }
+        vectorTableRows.add("<table>");
+        parseTweet();//send string of tweets off for parsing
+    }
+});
+    }//GEN-LAST:event_jBMessagesActionPerformed
+
      /***
      * @param toggleYN Allows Enable/Disable of UI Components
      * @return void
@@ -1156,6 +1185,11 @@ private void toggleUIButtons(boolean toggleYN){
             return webResource.path("/statuses/mentions.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
         }
 
+         public <T> T getDirectMessagesToMe(Class<T> responseType, String since, String since_id, String page) throws UniformInterfaceException {
+            String[] queryParamNames = new String[]{"since", "since_id", "page"};
+            String[] queryParamValues = new String[]{since, since_id, page};
+            return webResource.path("/statuses/direct_messages.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
+        }
 
             //this function returns the tweets of people I follow
             public <T> T getFriendsTimeline(Class<T> responseType, String since, String since_id, String page, String count) throws UniformInterfaceException {
@@ -1241,18 +1275,7 @@ private void toggleUIButtons(boolean toggleYN){
             webResource.addFilter(oauth_filter);
         }
 
-        /**
-         * The method increases OAuth nonce and timestamp parameters to make each request unique.
-         * The method should be called when repetitive requests are sent to service API provider:
-         * <pre>
-         * client.initOauth();
-         * client.getXXX(...);
-         * client.makeOAuthRequestUnique();
-         * client.getYYY(...);
-         * client.makeOAuthRequestUnique();
-         * client.getZZZ(...);
-         * </pre>
-         */
+       
         public void makeOAuthRequestUnique() {
             if (oauth_params != null) {
                 oauth_params.nonce().timestamp();
