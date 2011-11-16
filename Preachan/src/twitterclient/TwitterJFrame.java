@@ -220,6 +220,11 @@ private void collectLoginData() {
 
         jBLists.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_lists.gif"))); // NOI18N
         jBLists.setText("Lists");
+        jBLists.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBListsActionPerformed(evt);
+            }
+        });
         jPanel1.add(jBLists, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 170, -1));
 
         jBProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/twitterclient/icon_profile.gif"))); // NOI18N
@@ -975,6 +980,26 @@ private void jBSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 });
     }//GEN-LAST:event_jBMessagesActionPerformed
 
+    private void jBListsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBListsActionPerformed
+    //Lists Button lists any lists of tweople I create 
+        java.awt.EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+            jLPMainDisplay.moveToFront(jSPWebPane);
+            jPMyProfile.setVisible(false);
+            jPSearchPanel.setVisible(false);
+            jSPWebPane.setVisible(true);
+        client.initOAuth();
+        vectorTableRows.clear();
+        vectorTableRows.add("<table border='0' width='932'>");
+              
+        
+        vectorTableRows.add("<br> Hello Dog");
+        parseTweet();//send string of tweets off for parsing
+    }
+});
+    }//GEN-LAST:event_jBListsActionPerformed
+
      /***
      * @param toggleYN Allows Enable/Disable of UI Components
      * @return void
@@ -1194,7 +1219,8 @@ private void toggleUIButtons(boolean toggleYN){
             String[] queryParamValues = new String[]{since, since_id, page};
             return webResource.path("/direct_messages.xml").queryParams(getQueryOrFormParams(queryParamNames, queryParamValues)).accept(javax.ws.rs.core.MediaType.TEXT_XML).get(responseType);
         }
-
+         
+        
             //this function returns the tweets of people I follow
             public <T> T getFriendsTimeline(Class<T> responseType, String since, String since_id, String page, String count) throws UniformInterfaceException {
             String[] queryParamNames = new String[]{"since", "since_id", "page", "count"};
